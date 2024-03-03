@@ -4,7 +4,7 @@ A utility to extract the issue links for a particular contest submitted by a par
 
 This tool can be used to make a table of your own submitted findings once the backstage access of the contest has opened and you have access to the issue links to prepare for PJQA. This can also be used to extract submissions from top auditors and read them while waiting for PJQA. This is very useful, since for contests with a large number of submissions, the github UI does not show the entire list, and one needs to search manually and note down the issue numbers.
 
-This script uses `gh` to access the backstage. Make sure you have `gh` installed and logged in.
+This script uses `gh` (github cli tool) to access the backstage. Make sure you have `gh` installed and logged in.
 
 ## Installation
 
