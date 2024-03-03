@@ -64,10 +64,8 @@ c4-table 2024-02-hydradx-findings carrotsmuggler
 
 | Num |                                 URL                                 | Acceptance | Uniqueness | Comments |
 | :-: | :-----------------------------------------------------------------: | :--------: | :--------: | -------- |
-| 580 | https://github.com/code-423n4/2023-08-chainlink-findings/issues/580 |            |            |          |
-| 585 | https://github.com/code-423n4/2023-08-chainlink-findings/issues/585 |            |            |          |
-| 591 | https://github.com/code-423n4/2023-08-chainlink-findings/issues/591 |            |            |          |
-| 723 | https://github.com/code-423n4/2023-08-chainlink-findings/issues/723 |            |            |          |
+| 926 | https://github.com/code-423n4/2023-08-chainlink-findings/issues/926 |            |            |          |
+| 927 | https://github.com/code-423n4/2023-08-chainlink-findings/issues/927 |            |            |          |
 
 Columns have been named name as per my convenience. You can edit the code to change the column names/number.
 
