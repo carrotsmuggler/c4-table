@@ -1,0 +1,94 @@
+#!/usr/bin/env python3
+import subprocess
+from urllib.parse import urlparse
+import re
+import sys
+import argparse
+from argparse import RawTextHelpFormatter
+
+# Argument parser
+parser = argparse.ArgumentParser(
+    description="Generate markdown table of issues from repo link and username on code4rena",
+    epilog="Example: c4-table 2024-02-hydradx carrotsmuggler\n"
+    "Please make sure gh (github cli) is installed and logged in with access to code4rena backstage",
+    formatter_class=RawTextHelpFormatter,
+)
+parser.add_argument(
+    "repo_link",
+    help="Link to the repo. Accepts one of the following:\n"
+    " 1. http link to the findings repo\n"
+    " 2. Name of the contest repo\n"
+    " 3. Name of the findings repo",
+)
+parser.add_argument(
+    "username",
+    help="case sensitive username to search for",
+)
+parser.add_argument(
+    "-v", "--verbose", help="increase output verbosity", action="store_true"
+)
+args = parser.parse_args()
+
+# Parse repo link
+http_url = args.repo_link
+username = args.username
+if http_url[0] == "2":
+    owner = "code-423n4"
+    if http_url.endswith("findings"):
+        repo = http_url
+    else:
+        repo = http_url + "-findings"
+else:
+    # Parse the URL
+    parsed_url = urlparse(http_url)
+    # Extract the owner and repo
+    path_parts = parsed_url.path.strip("/").split("/")
+    owner = path_parts[0]
+    repo = path_parts[1]
+
+# gh command. Ensure gh is installed and logged in
+command = (
+    f"gh api '/repos/{owner}/{repo}/git/trees/main?recursive=true' -q '.tree[]|.path'"
+)
+if args.verbose:
+    print(command)
+process = subprocess.Popen(
+    command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+)
+stdout, stderr = process.communicate()
+if process.returncode != 0:
+    print(
+        f"Error occurred: Is gh cli installed and logged in with correct user? \n {stderr.decode()}"
+    )
+else:
+    if args.verbose:
+        print(f"Success getting file list")
+
+# Parse file list
+result = stdout.decode().strip().split("\n")
+user_elements = [element for element in result if username in element]
+filtered_elements = [
+    element
+    for element in user_elements
+    if not element.endswith(("Analysis.md", "Q.md", "G.md"))
+]
+numbers = [
+    re.search(rf"{username}-(.+)\.json", element).group(1)
+    for element in filtered_elements
+    if re.search(rf"{username}-(.+)\.json", element)
+]
+numbers = [int(i) for i in numbers]
+numbers.sort()
+
+# Create issue urls table
+url_list = [
+    f"https://github.com/{owner}/{repo}/issues/{element}" for element in numbers
+]
+combined_table = [
+    f"| {element1} | {element2} ||||" for element1, element2 in zip(numbers, url_list)
+]
+combined_table.insert(0, "| Num | URL | Acceptance | Uniqueness | Comments |")
+combined_table.insert(1, "| :-: | :-: | :-: | :-: | --- |")
+if args.verbose:
+    print("\n")
+print("\n".join(combined_table))
