@@ -71,6 +71,6 @@ Columns have been named name as per my convenience. You can edit the code to cha
 
 ### Support
 
-If you like this tool please let me know [here]() by giving me a reaction 👍 👎 ❤️ 👀
+If you like this tool please let me know [here](https://github.com/carrotsmuggler/c4-table/issues/1) by giving me a reaction 👍 👎 ❤️ 👀
 
 This work was inspired from c4-stats by @one-hundred-proof. Check it out [here](https://github.com/one-hundred-proof/c4-stats)
