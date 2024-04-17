@@ -62,10 +62,12 @@ c4-table 2024-02-hydradx-findings carrotsmuggler
 
 ### Output
 
-| Num |                                 URL                                 | Acceptance | Uniqueness | Comments |
-| :-: | :-----------------------------------------------------------------: | :--------: | :--------: | -------- |
-| 926 | https://github.com/code-423n4/2023-08-chainlink-findings/issues/926 |            |            |          |
-| 927 | https://github.com/code-423n4/2023-08-chainlink-findings/issues/927 |            |            |          |
+`c4-table 2023-08-chainlink carrotsmuggler`
+
+| Num |                                 URL                                 |                        Title                         | Acceptance | Uniqueness | Comments |
+| :-: | :-----------------------------------------------------------------: | :--------------------------------------------------: | :--------: | :--------: | -------- |
+| 927 | https://github.com/code-423n4/2023-08-chainlink-findings/issues/927 | Unbonding period can be constantly reset for no cost |            |            |          |
+| 926 | https://github.com/code-423n4/2023-08-chainlink-findings/issues/926 |   Rewards can keep increasing even after migration   |            |            |          |
 
 Columns have been named name as per my convenience. You can edit the code to change the column names/number.
 
