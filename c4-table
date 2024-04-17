@@ -5,6 +5,7 @@ import re
 import sys
 import argparse
 from argparse import RawTextHelpFormatter
+import json
 
 # Argument parser
 parser = argparse.ArgumentParser(
@@ -64,31 +65,71 @@ else:
     if args.verbose:
         print(f"Success getting file list")
 
-# Parse file list
+# Generate issue numbers list
 result = stdout.decode().strip().split("\n")
-user_elements = [element for element in result if username in element]
 filtered_elements = [
     element
-    for element in user_elements
-    if not element.endswith(("Analysis.md", "Q.md", "G.md"))
+    for element in result
+    if not element.endswith(("Analysis.md", "Q.md", "G.md", "README.md"))
 ]
-numbers = [
+issues_count = len(filtered_elements)
+user_elements = [element for element in filtered_elements if username in element]
+issue_numbers = [
     re.search(rf"{username}-(.+)\.json", element).group(1)
-    for element in filtered_elements
+    for element in user_elements
     if re.search(rf"{username}-(.+)\.json", element)
 ]
-numbers = [int(i) for i in numbers]
-numbers.sort()
+issue_numbers = [int(i) for i in issue_numbers]
+issue_numbers.sort()
+
+# Get paginated issue details
+pages = (issues_count // 30) + 1
+issues_dict = {}
+for page_num in range(1, pages + 1):
+    # Grab issues
+    command = f'gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "/repos/{owner}/{repo}/issues?state=all&page={page_num}"'
+    process = subprocess.Popen(
+        command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+    stdout, stderr = process.communicate()
+    if process.returncode != 0:
+        print(f"Error grabbing issue data. Querying: {command} \n {stderr.decode()}")
+    else:
+        if args.verbose:
+            print(f"Success getting issue list page: {page_num}")
+    # Decode stdout from bytes to string
+    stdout_str = stdout.decode("utf-8")
+    # Strip ANSI escape codes
+    ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+    stdout_str = ansi_escape.sub("", stdout_str)
+    # Convert string to JSON
+    stdout_json = json.loads(stdout_str)
+    if page_num == 1:
+        issues_dict = stdout_json
+    else:
+        issues_dict = issues_dict + stdout_json
+
+# Get relevant issues
+url_list = [
+    element["html_url"] for element in issues_dict if element["number"] in issue_numbers
+]
+title_list = [
+    element["title"] for element in issues_dict if element["number"] in issue_numbers
+]
+num_list = [
+    element["number"] for element in issues_dict if element["number"] in issue_numbers
+]
 
 # Create issue urls table
-url_list = [
-    f"https://github.com/{owner}/{repo}/issues/{element}" for element in numbers
-]
+# url_list = [
+#     f"https://github.com/{owner}/{repo}/issues/{element}" for element in issue_numbers
+# ]
 combined_table = [
-    f"| {element1} | {element2} ||||" for element1, element2 in zip(numbers, url_list)
+    f"| {element1} | {element2} | {element3} ||||"
+    for element1, element2, element3 in zip(num_list, url_list, title_list)
 ]
-combined_table.insert(0, "| Num | URL | Acceptance | Uniqueness | Comments |")
-combined_table.insert(1, "| :-: | :-: | :-: | :-: | --- |")
+combined_table.insert(0, "| Num | URL | Title | Acceptance | Uniqueness | Comments |")
+combined_table.insert(1, "| :-: | :-: | :-: | :-: | :-: | --- |")
 if args.verbose:
     print("\n")
 print("\n".join(combined_table))
