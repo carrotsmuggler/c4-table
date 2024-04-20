@@ -7,6 +7,7 @@ import argparse
 from argparse import RawTextHelpFormatter
 import json
 import concurrent.futures
+import itertools
 
 # %% Argument Handler
 # Parse arguments
@@ -30,7 +31,55 @@ parser.add_argument(
 parser.add_argument(
     "-v", "--verbose", help="increase output verbosity", action="store_true"
 )
+parser.add_argument(
+    "-u", "--url_only", help="Only lists html links, very fast", action="store_true"
+)
 args = parser.parse_args()
+
+
+# %% Helper functions
+# Fetch issues
+def fetch_issues(page_num, responses_per_page):
+    command = f'gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "/repos/{owner}/{repo}/issues?state=all&page={page_num}&per_page={responses_per_page}"'
+    process = subprocess.Popen(
+        command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+    stdout, stderr = process.communicate()
+    if process.returncode != 0:
+        print(f"Error grabbing issue data. Querying: {command} \n {stderr.decode()}")
+    else:
+        if args.verbose:
+            print(f"Success getting issue list page: {page_num}")
+    # Decode stdout from bytes to string
+    stdout_str = stdout.decode("utf-8")
+    # Strip ANSI escape codes
+    ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+    stdout_str = ansi_escape.sub("", stdout_str)
+    # Convert string to JSON
+    return json.loads(stdout_str)
+
+
+def print_table(
+    numbers=[], urls=[], titles=[], status=[], dupes=[], username="", repo=""
+):
+    # Find the largest length
+    number = max(len(numbers), len(urls), len(titles), len(status), len(dupes))
+    combined_table = [
+        "|" + "|".join(f" {str(el)} " if el else "" for el in elements) + "||"
+        for elements in itertools.zip_longest(
+            numbers, urls, titles, status, dupes, fillvalue=""
+        )
+    ]
+    combined_table.insert(
+        0, "| Num | URL | Title | Acceptance | Duplicate | Comments |"
+    )
+    combined_table.insert(1, "| :-: | :-: | :-: | :-: | :-: | :-: |")
+    if args.verbose:
+        print("\n")
+    print("\n".join(combined_table))
+    if number > 0:
+        print(f"\nFound {number} issues from {username} in {repo} repo\n")
+
 
 # %% Fetch file list and issue numbers
 # Parse repo link
@@ -83,30 +132,23 @@ issue_numbers = [
     if re.search(rf"{username}-(.+)\.json", element)
 ]
 issue_numbers = [int(i) for i in issue_numbers]
-issue_numbers.sort()
+issue_numbers.sort(reverse=True)
 
 
-# %% Fetch issues
-def fetch_issues(page_num, responses_per_page):
-    command = f'gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "/repos/{owner}/{repo}/issues?state=all&page={page_num}&per_page={responses_per_page}"'
-    process = subprocess.Popen(
-        command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    stdout, stderr = process.communicate()
-    if process.returncode != 0:
-        print(f"Error grabbing issue data. Querying: {command} \n {stderr.decode()}")
-    else:
-        if args.verbose:
-            print(f"Success getting issue list page: {page_num}")
-    # Decode stdout from bytes to string
-    stdout_str = stdout.decode("utf-8")
-    # Strip ANSI escape codes
-    ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
-    stdout_str = ansi_escape.sub("", stdout_str)
-    # Convert string to JSON
-    return json.loads(stdout_str)
+# %% Only links (No issue parsing)
+if args.url_only:
+    url_list = [
+        f"https://github.com/{owner}/{repo}/issues/{element}"
+        for element in issue_numbers
+    ]
+    combined_table = [
+        f"| {element1} | {element2} |||||"
+        for element1, element2 in zip(issue_numbers, url_list)
+    ]
+    print_table(numbers=issue_numbers, urls=url_list, username=username, repo=repo)
+    exit()
 
-
+# %% Fetch issue details
 # Get paginated issue details
 responses_per_page = 100
 pages = (issues_count // responses_per_page) + 1
@@ -147,9 +189,6 @@ combined_table = [
     f"| {element1} | {element2} | {element3} ||||"
     for element1, element2, element3 in zip(num_list, url_list, title_list)
 ]
-combined_table.insert(0, "| Num | URL | Title | Acceptance | Uniqueness | Comments |")
-combined_table.insert(1, "| :-: | :-: | :-: | :-: | :-: | --- |")
-if args.verbose:
-    print("\n")
-print("\n".join(combined_table))
-print(f"\nFound {len(url_list)} issues from {username} in {repo} repo\n")
+print_table(
+    numbers=num_list, urls=url_list, titles=title_list, username=username, repo=repo
+)
