@@ -1,0 +1,10 @@
+../c4-table 2024-02-hydradx carrotsmuggler
+../c4-table 2024-02-hydradx carrotsmuggler -u
+../c4-table 2023-07-tapioca GalloDaSballo
+../c4-table 2024-02-tapioca carrotsmuggler -u
+../c4-table 2024-03-acala-findings carrotsmuggler
+../c4-table 2024-03-ondo-finance-findings carrotsmuggler -u
+../c4-table 2024-03-neobase-findings rvierdiiev
+../c4-table 2024-02-wise-lending nonseodion -u
+../c4-table 2024-01-opus bin2chen
+../c4-table 2023-12-ethereumcreditguild critical-or-high -u

@@ -1,0 +1,13 @@
+| Num | URL | Title | Acceptance | Duplicate | Comments |
+| :-: | :-: | :-: | :-: | :-: | :-: |
+| 195 | https://github.com/code-423n4/2024-01-opus-findings/issues/195 | convert_to_yang_helper() loss precision ||||
+| 196 | https://github.com/code-423n4/2024-01-opus-findings/issues/196 | malicious donations increase yang price, leading to cumulative_price underflow ||||
+| 199 | https://github.com/code-423n4/2024-01-opus-findings/issues/199 | redistribute_helper()  some troves may not updated ||||
+| 201 | https://github.com/code-423n4/2024-01-opus-findings/issues/201 | when add new yang , get_recent_asset_absorption_error() may reach recursion limit ||||
+| 202 | https://github.com/code-423n4/2024-01-opus-findings/issues/202 | after shut,  no pull redistribution yang will be locked ||||
+| 203 | https://github.com/code-423n4/2024-01-opus-findings/issues/203 | withdraw_helper() pull yang will lost ||||
+| 204 | https://github.com/code-423n4/2024-01-opus-findings/issues/204 | pull_redistributed_debt_and_yangs() may get more yang than deserved. ||||
+| 221 | https://github.com/code-423n4/2024-01-opus-findings/issues/221 | QA Report ||||
+
+Found 8 issues from bin2chen in 2024-01-opus-findings repo
+

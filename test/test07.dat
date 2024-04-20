@@ -1,0 +1,10 @@
+| Num | URL | Title | Acceptance | Duplicate | Comments |
+| :-: | :-: | :-: | :-: | :-: | :-: |
+| 8 | https://github.com/code-423n4/2024-03-neobase-findings/issues/8 | QA Report ||||
+| 9 | https://github.com/code-423n4/2024-03-neobase-findings/issues/9 | Gas Optimizations ||||
+| 11 | https://github.com/code-423n4/2024-03-neobase-findings/issues/11 | LendingLedger.update_market takes wrong weight for markets ||||
+| 13 | https://github.com/code-423n4/2024-03-neobase-findings/issues/13 | In case if market will be blacklisted, then user will not be able to claim rewards ||||
+| 17 | https://github.com/code-423n4/2024-03-neobase-findings/issues/17 | M-01 from previous audit still present ||||
+
+Found 5 issues from rvierdiiev in 2024-03-neobase-findings repo
+
