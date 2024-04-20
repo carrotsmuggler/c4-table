@@ -132,7 +132,7 @@ issue_numbers = [
     if re.search(rf"{username}-(.+)\.json", element)
 ]
 issue_numbers = [int(i) for i in issue_numbers]
-issue_numbers.sort(reverse=True)
+issue_numbers.sort()
 
 
 # %% Only links (No issue parsing)
@@ -158,6 +158,7 @@ with concurrent.futures.ThreadPoolExecutor() as executor:
 # Combine results into issues_list
 for result in results:
     issues_list.extend(result)
+issues_list.sort(key=lambda issue: issue["number"])
 
 # convert issues into an array
 issues_arr = [None] * (len(issues_list) + 10)
