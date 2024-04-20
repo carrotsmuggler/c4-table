@@ -83,11 +83,11 @@ issue_numbers = [int(i) for i in issue_numbers]
 issue_numbers.sort()
 
 # Get paginated issue details
-pages = (issues_count // 30) + 1
+pages = (issues_count // 100) + 1
 issues_dict = {}
 for page_num in range(1, pages + 1):
     # Grab issues
-    command = f'gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "/repos/{owner}/{repo}/issues?state=all&page={page_num}"'
+    command = f'gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "/repos/{owner}/{repo}/issues?state=all&page={page_num}&per_page={100}"'
     process = subprocess.Popen(
         command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
