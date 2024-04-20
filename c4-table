@@ -141,10 +141,6 @@ if args.url_only:
         f"https://github.com/{owner}/{repo}/issues/{element}"
         for element in issue_numbers
     ]
-    combined_table = [
-        f"| {element1} | {element2} |||||"
-        for element1, element2 in zip(issue_numbers, url_list)
-    ]
     print_table(numbers=issue_numbers, urls=url_list, username=username, repo=repo)
     exit()
 
@@ -181,14 +177,6 @@ num_list = [
 ]
 
 # %% Table output
-# Create issue urls table
-# url_list = [
-#     f"https://github.com/{owner}/{repo}/issues/{element}" for element in issue_numbers
-# ]
-combined_table = [
-    f"| {element1} | {element2} | {element3} ||||"
-    for element1, element2, element3 in zip(num_list, url_list, title_list)
-]
 print_table(
     numbers=num_list, urls=url_list, titles=title_list, username=username, repo=repo
 )
