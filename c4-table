@@ -26,18 +26,70 @@ parser.add_argument(
 )
 parser.add_argument(
     "username",
+    nargs="?",
+    default=None,
+    type=str,
     help="case sensitive username to search for",
 )
 parser.add_argument(
     "-v", "--verbose", help="increase output verbosity", action="store_true"
 )
 parser.add_argument(
-    "-u", "--url_only", help="Only lists html links, very fast", action="store_true"
+    "-l", "--links_only", help="Only lists html links, very fast", action="store_true"
+)
+parser.add_argument(
+    "-u", "--user-stats", help="List all user stats", action="store_true"
 )
 args = parser.parse_args()
 
 
 # %% Helper functions
+# Fetch file list
+def fetch_list(owner, repo):
+    # gh command. Ensure gh is installed and logged in
+    command = f"gh api '/repos/{owner}/{repo}/git/trees/main?recursive=true' -q '.tree[]|.path'"
+    if args.verbose:
+        print(command)
+    process = subprocess.Popen(
+        command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+    stdout, stderr = process.communicate()
+    if process.returncode != 0:
+        print(
+            f"Error occurred: Is gh cli installed and logged in with correct user? \n {stderr.decode()}"
+        )
+    else:
+        if args.verbose:
+            print(f"Success getting file list")
+    result = stdout.decode().strip().split("\n")
+
+    # Remove non subs
+    filtered_elements = [
+        element
+        for element in result
+        if not element.endswith(("Analysis.md", "Q.md", "G.md", "README.md"))
+    ]
+    issues_count = len(filtered_elements)
+
+    issuenum_by_user = defaultdict(list)
+
+    # Iterate over the filtered elements
+    for element in filtered_elements:
+        # Use a regular expression to match the username and issue number
+        match = re.match(r"data/(?P<username>.+)-(?P<number>\d+)\.json", element)
+        if match:
+            # Extract the username and issue number from the match
+            temp_username = match.group("username")
+            temp_num = int(match.group("number"))
+            # Add the issue number to the list for this username
+            issuenum_by_user[temp_username].append(temp_num)
+
+    # Sort the issue numbers for each user
+    for numbers in issuenum_by_user.values():
+        numbers.sort()
+    return issuenum_by_user, issues_count
+
+
 # Fetch issues
 def fetch_issues(page_num, responses_per_page):
     command = f'gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "/repos/{owner}/{repo}/issues?state=all&page={page_num}&per_page={responses_per_page}"'
@@ -59,6 +111,7 @@ def fetch_issues(page_num, responses_per_page):
     return json.loads(stdout_str)
 
 
+# Display
 def print_table(
     numbers=[], urls=[], titles=[], status=[], dupes=[], username="", repo=""
 ):
@@ -84,7 +137,6 @@ def print_table(
 # %% Fetch file list and issue numbers
 # Parse repo link
 http_url = args.repo_link
-username = args.username
 if http_url[0] == "2":
     owner = "code-423n4"
     if http_url.endswith("findings"):
@@ -99,60 +151,38 @@ else:
     owner = path_parts[0]
     repo = path_parts[1]
 
-# gh command. Ensure gh is installed and logged in
-command = (
-    f"gh api '/repos/{owner}/{repo}/git/trees/main?recursive=true' -q '.tree[]|.path'"
-)
-if args.verbose:
-    print(command)
-process = subprocess.Popen(
-    command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-)
-stdout, stderr = process.communicate()
-if process.returncode != 0:
-    print(
-        f"Error occurred: Is gh cli installed and logged in with correct user? \n {stderr.decode()}"
-    )
-else:
-    if args.verbose:
-        print(f"Success getting file list")
-result = stdout.decode().strip().split("\n")
-
-# Remove non HM
-filtered_elements = [
-    element
-    for element in result
-    if not element.endswith(("Analysis.md", "Q.md", "G.md", "README.md"))
-]
-issues_count = len(filtered_elements)
-
-issuenum_by_user = defaultdict(list)
-
-# Iterate over the filtered elements
-for element in filtered_elements:
-    # Use a regular expression to match the username and issue number
-    match = re.match(r"data/(?P<username>.+)-(?P<number>\d+)\.json", element)
-    if match:
-        # Extract the username and issue number from the match
-        temp_username = match.group("username")
-        temp_num = int(match.group("number"))
-        # Add the issue number to the list for this username
-        issuenum_by_user[temp_username].append(temp_num)
-
-# Sort the issue numbers for each user
-for numbers in issuenum_by_user.values():
-    numbers.sort()
+issuenum_by_user, issues_count = fetch_list(owner, repo)
 
 
-# %% Only links (No issue parsing)
-if args.url_only:
+# %% Early exits
+# Only links (No issue parsing)
+if args.links_only:
+    username = args.username
+    if not username:
+        print("Username not provided")
+        quit()
     issue_numbers = issuenum_by_user[username]
     url_list = [
         f"https://github.com/{owner}/{repo}/issues/{element}"
         for element in issue_numbers
     ]
     print_table(numbers=issue_numbers, urls=url_list, username=username, repo=repo)
-    exit()
+    quit()
+
+if args.user_stats:
+    print(f"{'Username':<20} | {'Number of issues'}")
+    print(f"{'-'*20} | {'-'*15}")
+    # Sort the dictionary by the length of the issue numbers list
+    sorted_issuenum_by_user = sorted(
+        issuenum_by_user.items(), key=lambda item: len(item[1])
+    )
+    # Iterate over the sorted dictionary and print the username and number of issues
+    for username, issue_numbers in sorted_issuenum_by_user:
+        # print(f"User {username} submitted {len(issue_numbers)} issues")
+        print(f"{username:<20} | {len(issue_numbers)} ")
+    print(f"Total issues submitted: {issues_count}")
+    quit()
+
 
 # %% Fetch issue details
 # Get paginated issue details
@@ -177,6 +207,7 @@ for issue in issues_list:
 
 # %% User specific data
 # Get relevant issues
+username = args.username
 issue_numbers = issuenum_by_user[username]
 url_list = [
     element["html_url"] for element in issues_list if element["number"] in issue_numbers
