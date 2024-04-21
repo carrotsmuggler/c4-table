@@ -35,7 +35,7 @@ parser.add_argument(
     "-v", "--verbose", help="increase output verbosity", action="store_true"
 )
 parser.add_argument(
-    "-l", "--links_only", help="Only lists html links, very fast", action="store_true"
+    "-l", "--links-only", help="Only lists html links, very fast", action="store_true"
 )
 parser.add_argument(
     "-u", "--user-stats", help="List all user stats", action="store_true"
