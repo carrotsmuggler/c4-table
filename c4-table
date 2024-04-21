@@ -2,12 +2,12 @@
 import subprocess
 from urllib.parse import urlparse
 import re
-import sys
 import argparse
 from argparse import RawTextHelpFormatter
 import json
 import concurrent.futures
 import itertools
+from collections import defaultdict
 
 # %% Argument Handler
 # Parse arguments
@@ -118,25 +118,35 @@ else:
         print(f"Success getting file list")
 result = stdout.decode().strip().split("\n")
 
-# Generate issue numbers list
+# Remove non HM
 filtered_elements = [
     element
     for element in result
     if not element.endswith(("Analysis.md", "Q.md", "G.md", "README.md"))
 ]
 issues_count = len(filtered_elements)
-user_elements = [element for element in filtered_elements if username in element]
-issue_numbers = [
-    re.search(rf"{username}-(.+)\.json", element).group(1)
-    for element in user_elements
-    if re.search(rf"{username}-(.+)\.json", element)
-]
-issue_numbers = [int(i) for i in issue_numbers]
-issue_numbers.sort()
+
+issuenum_by_user = defaultdict(list)
+
+# Iterate over the filtered elements
+for element in filtered_elements:
+    # Use a regular expression to match the username and issue number
+    match = re.match(r"data/(?P<username>.+)-(?P<number>\d+)\.json", element)
+    if match:
+        # Extract the username and issue number from the match
+        temp_username = match.group("username")
+        temp_num = int(match.group("number"))
+        # Add the issue number to the list for this username
+        issuenum_by_user[temp_username].append(temp_num)
+
+# Sort the issue numbers for each user
+for numbers in issuenum_by_user.values():
+    numbers.sort()
 
 
 # %% Only links (No issue parsing)
 if args.url_only:
+    issue_numbers = issuenum_by_user[username]
     url_list = [
         f"https://github.com/{owner}/{repo}/issues/{element}"
         for element in issue_numbers
@@ -167,6 +177,7 @@ for issue in issues_list:
 
 # %% User specific data
 # Get relevant issues
+issue_numbers = issuenum_by_user[username]
 url_list = [
     element["html_url"] for element in issues_list if element["number"] in issue_numbers
 ]
