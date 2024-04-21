@@ -32,32 +32,18 @@ Follow instructions to login. For more help, check the [official documentation](
 
 ## Usage
 
-Run with `-h` for help. Program needs 2 arguments: a contest link and a username.
+Run with `-h` for help. Program needs 2 arguments: a contest link and a username (optional for some cases).
 
 Contest link can be:
 
-1. http link of the contest findings repo
-2. Name of the contest repo
-3. Name of the contest findings repo
+1. http link of the contest findings repo: `https://github.com/code-423n4/2023-10-zksync-findings`
+2. Name of the contest repo: `2023-10-zksync`
+3. Name of the contest findings repo: `2023-10-zksync-findings`
 
 ## Example usage
 
-### With http link
-
 ```bash
-c4-table https://github.com/code-423n4/2023-10-zksync-findings xuwinnie
-```
-
-### With repo name
-
-```bash
-c4-table 2023-07-tapioca GalloDaSballo
-```
-
-### With findings repo name
-
-```bash
-c4-table 2024-02-hydradx-findings carrotsmuggler
+c4-table 2023-08-chainlink carrotsmuggler
 ```
 
 ### Output
@@ -70,6 +56,28 @@ c4-table 2024-02-hydradx-findings carrotsmuggler
 | 926 | https://github.com/code-423n4/2023-08-chainlink-findings/issues/926 |   Rewards can keep increasing even after migration   |            |            |          |
 
 Columns have been named name as per my convenience. You can edit the code to change the column names/number.
+
+## Extra features
+
+### Quick links ( -l | --links-only)
+
+Fetches only the issue urls, and not the issue titles. Very fast since all issues dont need to be fetched.
+
+### Stat dump (-u | --user-stats)
+
+Passing username is optional here. This dumps out the submissions per user of the contest.
+
+```bash
+-> c4-table 2024-03-neobase-findings -u
+Username             | Number of issues
+-------------------- | ---------------
+0xsomeone            | 3
+carrotsmuggler       | 4
+rvierdiiev           | 5
+Arabadzhiev          | 6
+said                 | 6
+Total issues submitted: 25
+```
 
 ### Support
 
