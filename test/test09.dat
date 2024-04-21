@@ -1,13 +1,81 @@
-| Num | URL | Title | Acceptance | Duplicate | Comments |
-| :-: | :-: | :-: | :-: | :-: | :-: |
-| 195 | https://github.com/code-423n4/2024-01-opus-findings/issues/195 | convert_to_yang_helper() loss precision ||||
-| 196 | https://github.com/code-423n4/2024-01-opus-findings/issues/196 | malicious donations increase yang price, leading to cumulative_price underflow ||||
-| 199 | https://github.com/code-423n4/2024-01-opus-findings/issues/199 | redistribute_helper()  some troves may not updated ||||
-| 201 | https://github.com/code-423n4/2024-01-opus-findings/issues/201 | when add new yang , get_recent_asset_absorption_error() may reach recursion limit ||||
-| 202 | https://github.com/code-423n4/2024-01-opus-findings/issues/202 | after shut,  no pull redistribution yang will be locked ||||
-| 203 | https://github.com/code-423n4/2024-01-opus-findings/issues/203 | withdraw_helper() pull yang will lost ||||
-| 204 | https://github.com/code-423n4/2024-01-opus-findings/issues/204 | pull_redistributed_debt_and_yangs() may get more yang than deserved. ||||
-| 221 | https://github.com/code-423n4/2024-01-opus-findings/issues/221 | QA Report ||||
-
-Found 8 issues from bin2chen in 2024-01-opus-findings repo
-
+Username             | Number of issues
+-------------------- | ---------------
+0xA5DF               | 1 
+0xbrett8571          | 1 
+0xepley              | 1 
+3docSec              | 1 
+CaptainMango         | 1 
+Chao                 | 1 
+CodeWasp             | 1 
+Daniel526            | 1 
+ETHworker            | 1 
+JCK                  | 1 
+Sathish9098          | 1 
+Talfao               | 1 
+XDZIBECX             | 1 
+aariiif              | 1 
+albahaca             | 1 
+catellatech          | 1 
+desaperh             | 1 
+fouzantanveer        | 1 
+foxb868              | 1 
+fritzsima            | 1 
+hackerd25            | 1 
+hasmama              | 1 
+hassanshakeel13      | 1 
+hunter_w3b           | 1 
+invitedtea           | 1 
+johan-nahoj          | 1 
+rekxor               | 1 
+salman7548           | 1 
+tabriz               | 1 
+tala7985             | 1 
+unique               | 1 
+wahedtalash77        | 1 
+yongskiws            | 1 
+zigtur               | 1 
+zzzitron             | 1 
+Aymen0909            | 2 
+Mike_Bello90         | 2 
+Oxsadeeq             | 2 
+Rhaydden             | 2 
+Tadev                | 2 
+csanuragjain         | 2 
+jamshed              | 2 
+kodyvim              | 2 
+nmirchev8            | 2 
+piyushshukla         | 2 
+thrishul             | 2 
+0xwhisperingwoods    | 3 
+Inspectah            | 3 
+Kaysoft              | 3 
+TrungOre             | 3 
+ZanyBonzy            | 3 
+alix40               | 3 
+seerether            | 3 
+wangxx2026           | 3 
+51l3nt               | 4 
+erebus               | 4 
+hals                 | 4 
+iberry               | 4 
+ladboy233            | 4 
+Jeiwan               | 5 
+Ocean_Sky            | 5 
+mahdikarimi          | 5 
+zhaojohnson          | 5 
+0xTheC0der           | 6 
+ABAIKUNANBAEV        | 6 
+LinKenji             | 6 
+Nikki                | 6 
+farahanwealth        | 6 
+jasonxiale           | 6 
+dic0de               | 7 
+etherhood            | 7 
+kfx                  | 7 
+bin2chen             | 8 
+kaveyjoe             | 8 
+cheatc0d3            | 11 
+minhquanym           | 11 
+Polaris_tow          | 12 
+lsaudit              | 13 
+Total issues submitted: 243
