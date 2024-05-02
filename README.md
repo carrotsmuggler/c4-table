@@ -50,10 +50,10 @@ c4-table 2023-08-chainlink carrotsmuggler
 
 `c4-table 2023-08-chainlink carrotsmuggler`
 
-| Num |                                 URL                                 |                        Title                         | Acceptance | Uniqueness | Comments |
-| :-: | :-----------------------------------------------------------------: | :--------------------------------------------------: | :--------: | :--------: | -------- |
-| 927 | https://github.com/code-423n4/2023-08-chainlink-findings/issues/927 | Unbonding period can be constantly reset for no cost |            |            |          |
-| 926 | https://github.com/code-423n4/2023-08-chainlink-findings/issues/926 |   Rewards can keep increasing even after migration   |            |            |          |
+| Num |                                 URL                                 | Acceptance | Occurrence |                        Title                         | Comments |
+| :-: | :-----------------------------------------------------------------: | :--------: | :--------: | :--------------------------------------------------: | :------: |
+| 926 | https://github.com/code-423n4/2023-08-chainlink-findings/issues/926 |    D754    |     2      |   Rewards can keep increasing even after migration   |          |
+| 927 | https://github.com/code-423n4/2023-08-chainlink-findings/issues/927 |    D405    |     23     | Unbonding period can be constantly reset for no cost |          |
 
 Columns have been named name as per my convenience. You can edit the code to change the column names/number.
 
