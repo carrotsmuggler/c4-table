@@ -71,15 +71,15 @@ Fetches only the issue urls, and not the issue titles. Very fast since all issue
 Passing username is optional here. This dumps out the submissions per user of the contest.
 
 ```bash
--> c4-table 2024-03-neobase-findings -u
+-> c4-table 2024-02-hydradx -u
 Username             | Number of issues
 -------------------- | ---------------
-0xsomeone            | 3
-carrotsmuggler       | 4
-rvierdiiev           | 5
-Arabadzhiev          | 6
-said                 | 6
-Total issues submitted: 25
+QiuhaoLi             | 11
+castle_chain         | 12
+oakcobalt            | 15
+carrotsmuggler       | 20
+J4X                  | 28
+Total 206 issues submitted by 49 users
 ```
 
 ### Support
