@@ -48,12 +48,15 @@ c4-table 2023-08-chainlink carrotsmuggler
 
 ### Output
 
-`c4-table 2023-08-chainlink carrotsmuggler`
+`c4-table 2024-03-ondo-finance-findings carrotsmuggler`
 
-| Num |                                 URL                                 | Acceptance | Occurrence |                        Title                         | Comments |
-| :-: | :-----------------------------------------------------------------: | :--------: | :--------: | :--------------------------------------------------: | :------: |
-| 926 | https://github.com/code-423n4/2023-08-chainlink-findings/issues/926 |    D754    |     2      |   Rewards can keep increasing even after migration   |          |
-| 927 | https://github.com/code-423n4/2023-08-chainlink-findings/issues/927 |    D405    |     23     | Unbonding period can be constantly reset for no cost |          |
+| Num |                                  URL                                   | Acceptance | Occurrence |                                                 Title                                                  | Comments |
+| :-: | :--------------------------------------------------------------------: | :--------: | :--------: | :----------------------------------------------------------------------------------------------------: | :------: |
+| 141 | https://github.com/code-423n4/2024-03-ondo-finance-findings/issues/141 |     X      |     1      | BUIDL tokens in the manager contract can be force converted into USDC DOSing operations at a small fee |          |
+| 142 | https://github.com/code-423n4/2024-03-ondo-finance-findings/issues/142 |     P      |     4      |                    Users can lose access to funds due to minimum withdrawal limits.                    |          |
+| 143 | https://github.com/code-423n4/2024-03-ondo-finance-findings/issues/143 |     QA     |     1      |         Close hardcoded `MINIMUM_OUSG_PRICE` in `ousgInstantManager` contract can lead to DOS          |          |
+
+Found 3 issues from carrotsmuggler in 2024-03-ondo-finance-findings repo
 
 Columns have been named name as per my convenience. You can edit the code to change the column names/number.
 
