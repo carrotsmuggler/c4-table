@@ -192,7 +192,7 @@ if args.user_stats:
     for username, issue_numbers in sorted_issuenum_by_user:
         # print(f"User {username} submitted {len(issue_numbers)} issues")
         print(f"{username:<20} | {len(issue_numbers)} ")
-    print(f"Total issues submitted: {issues_count}")
+    print(f"Total {issues_count} issues submitted by {len(issuenum_by_user)} users")
     quit()
 
 
