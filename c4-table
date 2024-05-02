@@ -142,7 +142,7 @@ def print_table(
     if number > 0:
         print(f"\nFound {number} issues from {username} in {repo} repo\n")
     print(
-        "Legend: P - Primary, D{num} - Duplicate, X - Rejected, QA - Quality Assurance, A - Advanced\n"
+        "Legend: P - Primary, D{num} - Duplicate, X - Rejected, QA - Quality Assurance, A - Analysis\n"
     )
 
 
