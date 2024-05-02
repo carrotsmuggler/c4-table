@@ -118,13 +118,22 @@ def print_table(
     # Find the largest length
     number = max(len(numbers), len(urls), len(titles), len(status), len(dupes))
     combined_table = [
-        "|" + "|".join(f" {str(el)} " if el else "" for el in elements) + "||"
+        "|"
+        + "|".join(
+            (
+                f" {str(el).ljust(6)} "
+                if i == 2
+                else f" {str(el).ljust(5)} " if i == 3 else f" {str(el)} "
+            )
+            for i, el in enumerate(elements)
+        )
+        + "||"
         for elements in itertools.zip_longest(
-            numbers, urls, titles, status, dupes, fillvalue=""
+            numbers, urls, status, dupes, titles, fillvalue=""
         )
     ]
     combined_table.insert(
-        0, "| Num | URL | Title | Acceptance | Duplicate | Comments |"
+        0, "| Num | URL | Acceptance | Occurrence | Title | Comments |"
     )
     combined_table.insert(1, "| :-: | :-: | :-: | :-: | :-: | :-: |")
     if args.verbose:
@@ -132,6 +141,9 @@ def print_table(
     print("\n".join(combined_table))
     if number > 0:
         print(f"\nFound {number} issues from {username} in {repo} repo\n")
+    print(
+        "Legend: P - Primary, D{num} - Duplicate, X - Rejected, QA - Quality Assurance, A - Advanced\n"
+    )
 
 
 # %% Fetch file list and issue numbers
@@ -200,10 +212,45 @@ for result in results:
     issues_list.extend(result)
 issues_list.sort(key=lambda issue: issue["number"])
 
-# convert issues into an array
-issues_arr = [None] * (len(issues_list) + 10)
+# convert issues into an array and find parent issues
+modified_length = len(issues_list) + 10
+issues_arr = [None] * modified_length
+issues_parent = [None] * modified_length
+dupes_list = [1] * modified_length
+acceptance = [None] * modified_length
 for issue in issues_list:
     issues_arr[issue["number"]] = issue
+    issues_parent[issue["number"]] = issue["number"]
+    for label in issue["labels"]:
+        if (
+            label["name"] == "insufficient quality report"
+            or label["name"] == "low quality report"
+            or label["name"] == "out of scope"
+            or label["name"] == "unsatisfactory"
+            or label["name"] == "invalid"
+        ):
+            acceptance[issue["number"]] = "X"
+            break
+        else:
+            if label["name"] == "QA (Quality Assurance)":
+                acceptance[issue["number"]] = "QA"
+                break
+            if label["name"] == "analysis-advanced":
+                acceptance[issue["number"]] = "A"
+                break
+            if (
+                label["name"] == "primary issue"
+                or label["name"] == "confirmed for report"
+                or label["name"] == "selected for report"
+            ):
+                acceptance[issue["number"]] = "P"
+                continue
+            match = re.match(r"duplicate-(\d+)", label["name"])
+            if match:
+                issues_parent[issue["number"]] = int(match.group(1))
+                dupes_list[int(match.group(1))] += 1
+                acceptance[issue["number"]] = f"D{int(match.group(1))}"
+                continue
 
 # %% User specific data
 # Get relevant issues
@@ -218,8 +265,16 @@ title_list = [
 num_list = [
     element["number"] for element in issues_list if element["number"] in issue_numbers
 ]
+dupes_list = [dupes_list[issues_parent[element]] for element in issue_numbers]
+acceptance_list = [acceptance[element] for element in issue_numbers]
 
 # %% Table output
 print_table(
-    numbers=num_list, urls=url_list, titles=title_list, username=username, repo=repo
+    numbers=num_list,
+    urls=url_list,
+    titles=title_list,
+    username=username,
+    dupes=dupes_list,
+    status=acceptance_list,
+    repo=repo,
 )
