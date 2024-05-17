@@ -1,10 +1,10 @@
-| Num | URL | Acceptance | Occurrence | Title | Comments |
-| :-: | :-: | :-: | :-: | :-: | :-: |
-| 8 | https://github.com/code-423n4/2024-03-neobase-findings/issues/8 | QA     | 1     | QA Report ||
-| 9 | https://github.com/code-423n4/2024-03-neobase-findings/issues/9 | P      | 1     | Gas Optimizations ||
-| 11 | https://github.com/code-423n4/2024-03-neobase-findings/issues/11 | D10    | 4     | LendingLedger.update_market takes wrong weight for markets ||
-| 13 | https://github.com/code-423n4/2024-03-neobase-findings/issues/13 | QA     | 1     | In case if market will be blacklisted, then user will not be able to claim rewards ||
-| 17 | https://github.com/code-423n4/2024-03-neobase-findings/issues/17 | P      | 1     | M-01 from previous audit still present ||
+| Num | URL | Status | Occurences | Title |
+| :-: | :-: | :-: | :-: | :-: | 
+| 8  | https://github.com/code-423n4/2024-03-neobase-findings/issues/8  | QA  | 1 | QA Report                                                                        |
+| 9  | https://github.com/code-423n4/2024-03-neobase-findings/issues/9  | G   | 1 | Gas Optimizations                                                                |
+| 11 | https://github.com/code-423n4/2024-03-neobase-findings/issues/11 | D10 | 4 | LendingLedger.update_market takes wrong weight for markets                       |
+| 13 | https://github.com/code-423n4/2024-03-neobase-findings/issues/13 | QA  | 1 | In case if market will be blacklisted, then user will not be able to claim re... |
+| 17 | https://github.com/code-423n4/2024-03-neobase-findings/issues/17 | P   | 1 | M-01 from previous audit still present                                           |
 
 Found 5 issues from rvierdiiev in 2024-03-neobase-findings repo
 

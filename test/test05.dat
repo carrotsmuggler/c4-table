@@ -1,11 +1,14 @@
-| Num | URL | Acceptance | Occurrence | Title | Comments |
-| :-: | :-: | :-: | :-: | :-: | :-: |
-| 7 | https://github.com/code-423n4/2024-03-acala-findings/issues/7 | P      | 2     | `transfer_share_and_rewards` can be used to transfer out shares without transferring reward debt due to rounding. ||
-| 8 | https://github.com/code-423n4/2024-03-acala-findings/issues/8 | P      | 2     | Early user can break pool via inflation attack due to no minimum liquidity check in the incentive contract ||
-| 9 | https://github.com/code-423n4/2024-03-acala-findings/issues/9 | D17    | 3     | Multiple storage bloat vectors can be used to make the parachain expensive ||
-| 10 | https://github.com/code-423n4/2024-03-acala-findings/issues/10 | D88    | 4     | Users can sandwich reward updates to game rewards ||
+| Num | URL | Status | Occurences | Title |
+| :-: | :-: | :-: | :-: | :-: | 
+| 7   | https://github.com/code-423n4/2024-03-acala-findings/issues/7   | P | 2 | `transfer_share_and_rewards` can be used to transfer out shares without trans... |
+| 8   | https://github.com/code-423n4/2024-03-acala-findings/issues/8   | P | 2 | Early user can break pool via inflation attack due to no minimum liquidity ch... |
+| 16  | https://github.com/code-423n4/2024-03-acala-findings/issues/16  | P | 2 | `transfer_share_and_rewards` allows for self transfer                            |
+| 17  | https://github.com/code-423n4/2024-03-acala-findings/issues/17  | P | 3 | Storage can be bloated with low liquidtiy positions                              |
+| 24  | https://github.com/code-423n4/2024-03-acala-findings/issues/24  | P | 2 | Unbond_instant removes incorrect amount of shares                                |
+| 88  | https://github.com/code-423n4/2024-03-acala-findings/issues/88  | P | 4 | Incentive accumulation can be sandwiched with additional shares to gain advan... |
+| 103 | https://github.com/code-423n4/2024-03-acala-findings/issues/103 | P | 3 | Claiming rewards while the deduction rate is != 0, allows for repeated withdr... |
 
-Found 4 issues from carrotsmuggler in 2024-03-acala-findings repo
+Found 7 issues from Primary Issues in 2024-03-acala-findings repo
 
 Legend: P - Primary, D{num} - Duplicate, X - Rejected, QA - Quality Assurance, A - Analysis
 

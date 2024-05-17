@@ -1,6 +1,18 @@
 import subprocess
-import difflib
+import concurrent.futures
 
+
+# %% Run individual test
+def run_command(command, i):
+    fname = f"test{i:02}.dat"
+    # Append the redirection to the command
+    command += [">", fname]
+    # Run the command in a shell
+    subprocess.run(" ".join(command), shell=True)
+    print(f"Generated {fname}")
+
+
+# %% Read the commands
 # Take out the commands
 commands = []
 
@@ -13,12 +25,8 @@ with open("test_commands.txt", "r") as file:
         # Add the command to the list of commands
         commands.append(command)
 
+# %% Run all tests
 # Run each command
-# Run each command
-for i, command in enumerate(commands, start=1):
-    fname = f"test{i:02}.dat"
-    # Append the redirection to the command
-    command += [">", fname]
-    # Run the command in a shell
-    subprocess.run(" ".join(command), shell=True)
-    print(f"Generated {fname}")
+with concurrent.futures.ThreadPoolExecutor() as executor:
+    for i, command in enumerate(commands, start=1):
+        executor.submit(run_command, command, i)

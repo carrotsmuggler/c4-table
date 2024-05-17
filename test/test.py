@@ -1,7 +1,34 @@
 import subprocess
 import difflib
 import argparse
+import concurrent.futures
 
+
+# %% Run individual test
+def run_test(commands, i):
+    command = commands[i - 1]
+    output = subprocess.check_output(command).decode().strip()
+    fname = f"test{i:02}.dat"
+    # Load the expected output from a file
+    with open(f"{fname}", "r") as file:
+        expected_output = file.read().strip()
+    # Assert that the output matches the expected output
+    try:
+        assert output == expected_output
+        print(f"Passed test {i:02}")
+    except AssertionError:
+        diff = difflib.unified_diff(
+            expected_output.splitlines(),
+            output.splitlines(),
+            fromfile="expected_output",
+            tofile="output",
+            lineterm="",
+        )
+        print("\n".join(diff))
+        raise
+
+
+# %% Read the commands
 # Parse command line arguments
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -26,24 +53,6 @@ else:
     # Otherwise, run all tests
     ids = range(1, len(commands) + 1)
 
-for i in ids:
-    command = commands[i - 1]
-    output = subprocess.check_output(command).decode().strip()
-    fname = f"test{i:02}.dat"
-    # Load the expected output from a file
-    with open(f"{fname}", "r") as file:
-        expected_output = file.read().strip()
-    # Assert that the output matches the expected output
-    try:
-        assert output == expected_output
-        print(f"Passed test {i:02}")
-    except AssertionError:
-        diff = difflib.unified_diff(
-            expected_output.splitlines(),
-            output.splitlines(),
-            fromfile="expected_output",
-            tofile="output",
-            lineterm="",
-        )
-        print("\n".join(diff))
-        raise
+# %% Run all tests
+with concurrent.futures.ThreadPoolExecutor() as executor:
+    futures = [executor.submit(run_test, commands, i) for i in ids]
