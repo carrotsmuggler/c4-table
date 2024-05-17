@@ -126,8 +126,8 @@ def print_table(
     url_length = len(urls[0]) - len(str(numbers[0])) if urls else 0
     max_num_length = len(str(numbers[-1])) if numbers else 0
     max_dupe_length = len(str(max(dupes))) if dupes else 0
-    max_status_length = max(len(s) for s in status)
-    max_title_length = min(max(len(s) for s in titles), 80)
+    max_status_length = max(len(s) for s in status) if status else 0
+    max_title_length = min(max(len(s) for s in titles), 80) if titles else 0
     combined_table = [
         "|"
         + "|".join(
