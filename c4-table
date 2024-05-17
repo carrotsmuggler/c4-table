@@ -40,6 +40,12 @@ parser.add_argument(
 parser.add_argument(
     "-u", "--user-stats", help="List all user stats", action="store_true"
 )
+parser.add_argument(
+    "-p",
+    "--primary-issues",
+    help="List all primary/selected for report issues",
+    action="store_true",
+)
 args = parser.parse_args()
 
 
@@ -117,25 +123,44 @@ def print_table(
 ):
     # Find the largest length
     number = max(len(numbers), len(urls), len(titles), len(status), len(dupes))
+    url_length = len(urls[0]) - len(str(numbers[0])) if urls else 0
+    max_num_length = len(str(numbers[-1])) if numbers else 0
+    max_dupe_length = len(str(max(dupes))) if dupes else 0
+    max_status_length = max(len(s) for s in status)
+    max_title_length = min(max(len(s) for s in titles), 80)
     combined_table = [
         "|"
         + "|".join(
             (
-                f" {str(el).ljust(6)} "
-                if i == 2
-                else f" {str(el).ljust(5)} " if i == 3 else f" {str(el)} "
+                f" {str(el).ljust(max_num_length)} "
+                if i == 0
+                else (
+                    f" {str(el).ljust(url_length + max_num_length)} "
+                    if i == 1
+                    else (
+                        f" {str(el).ljust(max_status_length)} "
+                        if i == 2
+                        else (
+                            f" {str(el).ljust(max_dupe_length)} "
+                            if i == 3
+                            else (
+                                f" {str(el[:77]) + '...' if len(str(el)) > 80 else str(el).ljust(max_title_length)} "
+                                if i == 4
+                                else str(el)
+                            )
+                        )
+                    )
+                )
             )
             for i, el in enumerate(elements)
         )
-        + "||"
+        + "|"
         for elements in itertools.zip_longest(
             numbers, urls, status, dupes, titles, fillvalue=""
         )
     ]
-    combined_table.insert(
-        0, "| Num | URL | Acceptance | Occurrence | Title | Comments |"
-    )
-    combined_table.insert(1, "| :-: | :-: | :-: | :-: | :-: | :-: |")
+    combined_table.insert(0, "| Num | URL | Status | Occurences | Title |")
+    combined_table.insert(1, "| :-: | :-: | :-: | :-: | :-: | ")
     if args.verbose:
         print("\n")
     print("\n".join(combined_table))
@@ -258,6 +283,25 @@ for issue in issues_list:
                 continue
     if acceptance[issue["number"]] == "P":
         primary_issues.append(issue["number"])
+
+# %% Primary issues/ Report generation
+# Get all issues marked P (selected for report, or primary issues)
+if args.primary_issues:
+    num_list = [element for element in primary_issues]
+    url_list = [issues_arr[element]["html_url"] for element in num_list]
+    title_list = [issues_arr[element]["title"] for element in num_list]
+    dupes_list_user = [dupes_list[issues_parent[element]] for element in num_list]
+    acceptance_list = [acceptance[element] for element in num_list]
+    print_table(
+        numbers=num_list,
+        urls=url_list,
+        titles=title_list,
+        username="Primary Issues",
+        dupes=dupes_list_user,
+        status=acceptance_list,
+        repo=repo,
+    )
+    quit()
 
 # %% User specific data
 # Get relevant issues
