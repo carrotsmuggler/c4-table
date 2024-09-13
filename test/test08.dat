@@ -1,16 +1,16 @@
-| Num | URL | Status | Occurences | Title |
-| :-: | :-: | :-: | :-: | :-: | 
-| 65  | https://github.com/code-423n4/2023-12-ethereumcreditguild-findings/issues/65  | D994  | 30 | Risk-free reward accrual in SurplusGuildMinter                                   |
-| 69  | https://github.com/code-423n4/2023-12-ethereumcreditguild-findings/issues/69  | P     | 7  | SurplusGuildMinter.getReward() is susceptible to DoS due to unbounded loop       |
-| 80  | https://github.com/code-423n4/2023-12-ethereumcreditguild-findings/issues/80  | D1194 | 24 | Anyone can drain  ProfitManager balance by calling claimGaugeRewards() directly  |
-| 91  | https://github.com/code-423n4/2023-12-ethereumcreditguild-findings/issues/91  | D991  | 13 | Doubling balance in Credit tokens and locking funds of other users via self-t... |
-| 94  | https://github.com/code-423n4/2023-12-ethereumcreditguild-findings/issues/94  | X     | 1  | Credit tokens minters in PSM can avoid losses                                    |
-| 179 | https://github.com/code-423n4/2023-12-ethereumcreditguild-findings/issues/179 | X     | 1  | First Credit token minter acquires all future rewards when underlying token d... |
-| 288 | https://github.com/code-423n4/2023-12-ethereumcreditguild-findings/issues/288 | QA    | 1  | Borrower can manipulate auction by adding their address to the collateral tok... |
-| 313 | https://github.com/code-423n4/2023-12-ethereumcreditguild-findings/issues/313 | X     | 1  | Borrower may redeem Credit tokens in PSM without paying the interest             |
-| 335 | https://github.com/code-423n4/2023-12-ethereumcreditguild-findings/issues/335 | P     | 1  | RateLimitedMinter isn't used by SimplePSM resulting in Goverance attacks         |
+| Num | URL | Severity | Status | Occurences | Title |
+| :-: | :-: | :-: | :-: | :-: | :-: |
+| 65  | https://github.com/code-423n4/2023-12-ethereumcreditguild-findings/issues/65  | M  | D994  | 30 | Risk-free reward accrual in SurplusGuildMinter                                   |
+| 69  | https://github.com/code-423n4/2023-12-ethereumcreditguild-findings/issues/69  | M  | P     | 7  | SurplusGuildMinter.getReward() is susceptible to DoS due to unbounded loop       |
+| 80  | https://github.com/code-423n4/2023-12-ethereumcreditguild-findings/issues/80  | H  | D1194 | 24 | Anyone can drain  ProfitManager balance by calling claimGaugeRewards() directly  |
+| 91  | https://github.com/code-423n4/2023-12-ethereumcreditguild-findings/issues/91  | H  | D991  | 13 | Doubling balance in Credit tokens and locking funds of other users via self-t... |
+| 94  | https://github.com/code-423n4/2023-12-ethereumcreditguild-findings/issues/94  | M  | X     | 1  | Credit tokens minters in PSM can avoid losses                                    |
+| 179 | https://github.com/code-423n4/2023-12-ethereumcreditguild-findings/issues/179 | H  | X     | 1  | First Credit token minter acquires all future rewards when underlying token d... |
+| 288 | https://github.com/code-423n4/2023-12-ethereumcreditguild-findings/issues/288 | QA | QA    | 1  | Borrower can manipulate auction by adding their address to the collateral tok... |
+| 313 | https://github.com/code-423n4/2023-12-ethereumcreditguild-findings/issues/313 | H  | X     | 1  | Borrower may redeem Credit tokens in PSM without paying the interest             |
+| 335 | https://github.com/code-423n4/2023-12-ethereumcreditguild-findings/issues/335 | M  | P     | 1  | RateLimitedMinter isn't used by SimplePSM resulting in Goverance attacks         |
 
 Found 9 issues from critical-or-high in 2023-12-ethereumcreditguild-findings repo
 
-Legend: P - Primary, D{num} - Duplicate, X - Rejected, QA - Quality Assurance, A - Analysis
-
+Severity Legend: H - High Risk, M - Medium Risk, QA - Quality Assurance, A - Analysis, G - Gas Optimization
+Status Legend: P - Primary, D{num} - Duplicate, X - Rejected, QA - Quality Assurance, A - Analysis

@@ -1,10 +1,10 @@
-| Num | URL | Status | Occurences | Title |
-| :-: | :-: | :-: | :-: | :-: | 
-| 141 | https://github.com/code-423n4/2024-03-ondo-finance-findings/issues/141 |  |  |  |
-| 142 | https://github.com/code-423n4/2024-03-ondo-finance-findings/issues/142 |  |  |  |
-| 143 | https://github.com/code-423n4/2024-03-ondo-finance-findings/issues/143 |  |  |  |
+| Num | URL | Severity | Status | Occurences | Title |
+| :-: | :-: | :-: | :-: | :-: | :-: |
+| 141 | https://github.com/code-423n4/2024-03-ondo-finance-findings/issues/141 |  |  |  |  |
+| 142 | https://github.com/code-423n4/2024-03-ondo-finance-findings/issues/142 |  |  |  |  |
+| 143 | https://github.com/code-423n4/2024-03-ondo-finance-findings/issues/143 |  |  |  |  |
 
 Found 3 issues from carrotsmuggler in 2024-03-ondo-finance-findings repo
 
-Legend: P - Primary, D{num} - Duplicate, X - Rejected, QA - Quality Assurance, A - Analysis
-
+Severity Legend: H - High Risk, M - Medium Risk, QA - Quality Assurance, A - Analysis, G - Gas Optimization
+Status Legend: P - Primary, D{num} - Duplicate, X - Rejected, QA - Quality Assurance, A - Analysis

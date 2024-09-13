@@ -1,27 +1,27 @@
-| Num | URL | Status | Occurences | Title |
-| :-: | :-: | :-: | :-: | :-: | 
-| 83  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/83  | D154 | 3  | [H01] Share manipulation attack due to wrong check in `withdraw_asset_amount`... |
-| 84  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/84  | P    | 2  | [H02] No `safe_withdrawal` option in `withdraw_protocol_liquidity` function i... |
-| 85  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/85  | D93  | 17 | [M01] Missing slippage control in stableswap's `add_liquidity` can lead to lo... |
-| 86  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/86  | P    | 3  | [M02] Complete liquidity removals fail from stableswap pools                     |
-| 87  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/87  | X    | 1  | [M03] Stableswap math uses wrong iteration limits                                |
-| 88  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/88  | X    | 1  | [M04] Missing check for input=output in stableswap math                          |
-| 89  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/89  | QA   | 1  | [M05] `MinimumPoolLiquidity` check affects tokens with different decimals dif... |
-| 90  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/90  | X    | 1  | [M06] Missing price check in `add_token` in omnipool can DOS further deposits.   |
-| 91  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/91  | QA   | 1  | [M07] Weight cap limits in Omnipool can be violated via `add_token` function     |
-| 92  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/92  | D93  | 17 | [M08] No slippage check in `add_liquidity` can lead to less liquidity shares ... |
-| 93  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/93  | P    | 17 | [M09] No slippage check in `remove_liquidity` function in omnipool can lead t... |
-| 94  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/94  | QA   | 1  | [M10] `withdraw_protocol_liquidity` at a wrong price can be used to drain the... |
-| 95  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/95  | X    | 1  | [M11] Liquidity addition and removal in omnipool can go offline during period... |
-| 96  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/96  | QA   | 1  | [M12] Stableswap decrease in Amplification factor can be used to steal tokens... |
-| 111 | https://github.com/code-423n4/2024-02-hydradx-findings/issues/111 | QA   | 1  | QA Report                                                                        |
-| 114 | https://github.com/code-423n4/2024-02-hydradx-findings/issues/114 | X    | 1  | [H03] `ensure_price` slippage control in omnipools can be bypassed with swaps    |
-| 115 | https://github.com/code-423n4/2024-02-hydradx-findings/issues/115 | QA   | 1  | [M13] Missing `REMOVE_LIQUIDITY` check in `withdraw_protocol_liquidity` funct... |
-| 116 | https://github.com/code-423n4/2024-02-hydradx-findings/issues/116 | X    | 1  | [M14] `add_token` in omnipool can be sandwich attacked for profit if a large ... |
-| 136 | https://github.com/code-423n4/2024-02-hydradx-findings/issues/136 | A    | 1  | Analysis                                                                         |
-| 142 | https://github.com/code-423n4/2024-02-hydradx-findings/issues/142 | X    | 1  | [H04] Inefficient Liquidity removal form stableswap can lead to losses and ME... |
+| Num | URL | Severity | Status | Occurences | Title |
+| :-: | :-: | :-: | :-: | :-: | :-: |
+| 83  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/83  | M  | D154 | 3  | [H01] Share manipulation attack due to wrong check in `withdraw_asset_amount`... |
+| 84  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/84  | M  | P    | 2  | [H02] No `safe_withdrawal` option in `withdraw_protocol_liquidity` function i... |
+| 85  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/85  | M  | D93  | 17 | [M01] Missing slippage control in stableswap's `add_liquidity` can lead to lo... |
+| 86  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/86  | M  | P    | 3  | [M02] Complete liquidity removals fail from stableswap pools                     |
+| 87  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/87  | M  | X    | 1  | [M03] Stableswap math uses wrong iteration limits                                |
+| 88  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/88  | M  | X    | 1  | [M04] Missing check for input=output in stableswap math                          |
+| 89  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/89  | QA | QA   | 1  | [M05] `MinimumPoolLiquidity` check affects tokens with different decimals dif... |
+| 90  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/90  | QA | X    | 1  | [M06] Missing price check in `add_token` in omnipool can DOS further deposits.   |
+| 91  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/91  | QA | QA   | 1  | [M07] Weight cap limits in Omnipool can be violated via `add_token` function     |
+| 92  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/92  | M  | D93  | 17 | [M08] No slippage check in `add_liquidity` can lead to less liquidity shares ... |
+| 93  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/93  | M  | P    | 17 | [M09] No slippage check in `remove_liquidity` function in omnipool can lead t... |
+| 94  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/94  | QA | QA   | 1  | [M10] `withdraw_protocol_liquidity` at a wrong price can be used to drain the... |
+| 95  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/95  | M  | X    | 1  | [M11] Liquidity addition and removal in omnipool can go offline during period... |
+| 96  | https://github.com/code-423n4/2024-02-hydradx-findings/issues/96  | QA | QA   | 1  | [M12] Stableswap decrease in Amplification factor can be used to steal tokens... |
+| 111 | https://github.com/code-423n4/2024-02-hydradx-findings/issues/111 | QA | QA   | 1  | QA Report                                                                        |
+| 114 | https://github.com/code-423n4/2024-02-hydradx-findings/issues/114 | H  | X    | 1  | [H03] `ensure_price` slippage control in omnipools can be bypassed with swaps    |
+| 115 | https://github.com/code-423n4/2024-02-hydradx-findings/issues/115 | QA | QA   | 1  | [M13] Missing `REMOVE_LIQUIDITY` check in `withdraw_protocol_liquidity` funct... |
+| 116 | https://github.com/code-423n4/2024-02-hydradx-findings/issues/116 | M  | X    | 1  | [M14] `add_token` in omnipool can be sandwich attacked for profit if a large ... |
+| 136 | https://github.com/code-423n4/2024-02-hydradx-findings/issues/136 | A  | A    | 1  | Analysis                                                                         |
+| 142 | https://github.com/code-423n4/2024-02-hydradx-findings/issues/142 | QA | X    | 1  | [H04] Inefficient Liquidity removal form stableswap can lead to losses and ME... |
 
 Found 20 issues from carrotsmuggler in 2024-02-hydradx-findings repo
 
-Legend: P - Primary, D{num} - Duplicate, X - Rejected, QA - Quality Assurance, A - Analysis
-
+Severity Legend: H - High Risk, M - Medium Risk, QA - Quality Assurance, A - Analysis, G - Gas Optimization
+Status Legend: P - Primary, D{num} - Duplicate, X - Rejected, QA - Quality Assurance, A - Analysis

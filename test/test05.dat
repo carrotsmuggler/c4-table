@@ -1,14 +1,14 @@
-| Num | URL | Status | Occurences | Title |
-| :-: | :-: | :-: | :-: | :-: | 
-| 7   | https://github.com/code-423n4/2024-03-acala-findings/issues/7   | P | 2 | `transfer_share_and_rewards` can be used to transfer out shares without trans... |
-| 8   | https://github.com/code-423n4/2024-03-acala-findings/issues/8   | P | 2 | Early user can break pool via inflation attack due to no minimum liquidity ch... |
-| 16  | https://github.com/code-423n4/2024-03-acala-findings/issues/16  | P | 2 | `transfer_share_and_rewards` allows for self transfer                            |
-| 17  | https://github.com/code-423n4/2024-03-acala-findings/issues/17  | P | 3 | Storage can be bloated with low liquidtiy positions                              |
-| 24  | https://github.com/code-423n4/2024-03-acala-findings/issues/24  | P | 2 | Unbond_instant removes incorrect amount of shares                                |
-| 88  | https://github.com/code-423n4/2024-03-acala-findings/issues/88  | P | 4 | Incentive accumulation can be sandwiched with additional shares to gain advan... |
-| 103 | https://github.com/code-423n4/2024-03-acala-findings/issues/103 | P | 3 | Claiming rewards while the deduction rate is != 0, allows for repeated withdr... |
+| Num | URL | Severity | Status | Occurences | Title |
+| :-: | :-: | :-: | :-: | :-: | :-: |
+| 7   | https://github.com/code-423n4/2024-03-acala-findings/issues/7   | H | P | 2 | `transfer_share_and_rewards` can be used to transfer out shares without trans... |
+| 8   | https://github.com/code-423n4/2024-03-acala-findings/issues/8   | H | P | 2 | Early user can break pool via inflation attack due to no minimum liquidity ch... |
+| 16  | https://github.com/code-423n4/2024-03-acala-findings/issues/16  | H | P | 2 | `transfer_share_and_rewards` allows for self transfer                            |
+| 17  | https://github.com/code-423n4/2024-03-acala-findings/issues/17  | M | P | 3 | Storage can be bloated with low liquidtiy positions                              |
+| 24  | https://github.com/code-423n4/2024-03-acala-findings/issues/24  | M | P | 2 | Unbond_instant removes incorrect amount of shares                                |
+| 88  | https://github.com/code-423n4/2024-03-acala-findings/issues/88  | M | P | 4 | Incentive accumulation can be sandwiched with additional shares to gain advan... |
+| 103 | https://github.com/code-423n4/2024-03-acala-findings/issues/103 | M | P | 3 | Claiming rewards while the deduction rate is != 0, allows for repeated withdr... |
 
 Found 7 issues from Primary Issues in 2024-03-acala-findings repo
 
-Legend: P - Primary, D{num} - Duplicate, X - Rejected, QA - Quality Assurance, A - Analysis
-
+Severity Legend: H - High Risk, M - Medium Risk, QA - Quality Assurance, A - Analysis, G - Gas Optimization
+Status Legend: P - Primary, D{num} - Duplicate, X - Rejected, QA - Quality Assurance, A - Analysis

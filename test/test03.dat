@@ -1,52 +1,52 @@
-| Num | URL | Status | Occurences | Title |
-| :-: | :-: | :-: | :-: | :-: | 
-| 877  | https://github.com/code-423n4/2023-07-tapioca-findings/issues/877  | QA    | 1 | AirdropBroker and TapiocaOptionBroker are subject to MEV manipulation around ... |
-| 879  | https://github.com/code-423n4/2023-07-tapioca-findings/issues/879  | P     | 4 | `_getDiscountedPaymentAmount` doesn't work for tokens with more than 18 decimals |
-| 880  | https://github.com/code-423n4/2023-07-tapioca-findings/issues/880  | QA    | 1 | `addRewardToken` allows Unbounded Rewards and duplicate entries                  |
-| 1184 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1184 | P     | 1 | Seer.get uses a view fetcher, breaking the intended use                          |
-| 1215 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1215 | X     | 1 | There's no way to revoke vesting                                                 |
-| 1216 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1216 | X     | 1 | `_unlockTwTapPosition` doesn't work because all functions calling it are not ... |
-| 1217 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1217 | QA    | 1 | `emitForkWeek` and `sglPools.poolWeight` may desynch causing incorrect reward... |
-| 1218 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1218 | P     | 5 | `emitForWeek` will lose `emissionForWeek` if one week is skipped                 |
-| 1242 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1242 | X     | 1 | Options can be exercised via Flashloan if they are profitable Enough             |
-| 1245 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1245 | X     | 1 | TapiocaOptionBrokers - Lack of Minimum Duration for `tOLP` means people can l... |
-| 1246 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1246 | P     | 3 | `TapiocaOptionLiquidityProvision` causes Loss of Yield when depositing and wi... |
-| 1247 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1247 | P     | 1 | `TapiocaOptionLiquidityProvision` stores amount which cause Socialization of ... |
-| 1274 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1274 | X     | 1 | Some Chainlink Oracle Validation is missing                                      |
-| 1275 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1275 | D1021 | 2 | Oracle can revert in-spite of the fact that Liquidations would want to be exe... |
-| 1276 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1276 | P     | 2 | Burning FlashFee breaks a core protocol invariant                                |
-| 1277 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1277 | P     | 3 | Using `setBigBangEthMarketDebtRate` or `setBigBangConfig` cause incorrect int... |
-| 1278 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1278 | D1043 | 8 | Max FlashLoan can be sidestepped by taking multiple Flashloans                   |
-| 1279 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1279 | QA    | 1 | MaxFlashloan is not coded to spec, always returns `maxFlashMint`                 |
-| 1315 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1315 | QA    | 1 | Funds in the AAVE Strategy can be blocked DOS by preventing withdraw             |
-| 1316 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1316 | QA    | 1 | If the AAVE Lending Pool is paused, funds will be stuck and no-one will be ab... |
-| 1321 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1321 | P     | 1 |  MEV Attack on `stkAAVE` causes the AaveStrategy to give away all of the Yield   |
-| 1324 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1324 | D1330 | 8 | CompoundStrategy stale `_currentBalance` may cause incorrect liquidations        |
-| 1330 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1330 | P     | 8 | CompoundStrategy `_currentBalance` uses `exchangeRateStored` which is leaks v... |
-| 1333 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1333 | P     | 2 | a4185aaf2a0a953dd8ea2e7f62a58087c4cd5680bfbe8c3a749efef847af3c3b - Sent Priva... |
-| 1420 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1420 | X     | 1 | ConvexTrycripto prices the LP token in WETH, allowing for Price Manipulation     |
-| 1421 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1421 | X     | 1 | Claimer can Sandwhich all rewards                                                |
-| 1423 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1423 | X     | 1 | Due to front-running and sanwhiching, normal users overpay for `ConvexTriCryp... |
-| 1425 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1425 | P     | 2 | Convex `BaseRewardPool` allows Claim on Behalf which causes delta to break - ... |
-| 1428 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1428 | P     | 1 | `TricryptoLPStrategy.compoundAmount` always returns 0 because it's using stat... |
-| 1429 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1429 | P     | 1 | Curve Strategy Yield can be Lost by Griefing due to Delta Balance Check          |
-| 1430 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1430 | P     | 1 | LidEthStrategys Hardcoded 2.5% slippage allows stealing all tokens above $2MLN   |
-| 1432 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1432 | P     | 6 | `LidoEthStrategy._currentBalance` is subject to price manipulation, allows ov... |
-| 1434 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1434 | X     | 1 | When stETH Depegs the strategy will not allow withdrawals                        |
-| 1437 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1437 | P     | 1 | LidoETHStrategy buys stETH at 1-1 instead of buying it from the Pool at Discount |
-| 1447 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1447 | P     | 4 | Usage of `BalancerStrategy.updateCache` will cause single sided Loss, discoun... |
-| 1449 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1449 | P     | 1 | BalancerStrategy `_withdraw` uses `BPT_IN_FOR_EXACT_TOKENS_OUT` which can be ... |
-| 1456 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1456 | P     | 7 | In case of Loss to the Yearn Vault, the Contract will stop working until the ... |
-| 1457 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1457 | D1456 | 7 | YearnStrategy.emergencyWithdraw` has a hardcoded 0 loss, this can cause rever... |
-| 1459 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1459 | P     | 1 | `YearnStrategy` is ignoring the `lockedProfits`, giving away all of the Yield... |
-| 1540 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1540 | D805  | 3 | `StargateStrategy` Delta Balance in compound means some rewards are lost         |
-| 1553 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1553 | P     | 4 | Single UniswapV3Swapper using a single fee makes it highly likely to be subop... |
-| 1561 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1561 | P     | 1 | `getDebtRate()` is view and reads `ethMarket.getTotalDebt` allowing for manip... |
-| 1565 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1565 | A     | 1 | Analysis                                                                         |
-| 1578 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1578 | QA    | 1 | QA Report                                                                        |
-| 1592 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1592 | X     | 1 | Front-run grief in `participate` preventing people from gaining voting power     |
+| Num | URL | Severity | Status | Occurences | Title |
+| :-: | :-: | :-: | :-: | :-: | :-: |
+| 877  | https://github.com/code-423n4/2023-07-tapioca-findings/issues/877  | QA | QA    | 1 | AirdropBroker and TapiocaOptionBroker are subject to MEV manipulation around ... |
+| 879  | https://github.com/code-423n4/2023-07-tapioca-findings/issues/879  | M  | P     | 4 | `_getDiscountedPaymentAmount` doesn't work for tokens with more than 18 decimals |
+| 880  | https://github.com/code-423n4/2023-07-tapioca-findings/issues/880  | QA | QA    | 1 | `addRewardToken` allows Unbounded Rewards and duplicate entries                  |
+| 1184 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1184 | M  | P     | 1 | Seer.get uses a view fetcher, breaking the intended use                          |
+| 1215 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1215 | M  | X     | 1 | There's no way to revoke vesting                                                 |
+| 1216 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1216 | M  | X     | 1 | `_unlockTwTapPosition` doesn't work because all functions calling it are not ... |
+| 1217 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1217 | QA | QA    | 1 | `emitForkWeek` and `sglPools.poolWeight` may desynch causing incorrect reward... |
+| 1218 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1218 | M  | P     | 5 | `emitForWeek` will lose `emissionForWeek` if one week is skipped                 |
+| 1242 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1242 | M  | X     | 1 | Options can be exercised via Flashloan if they are profitable Enough             |
+| 1245 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1245 | M  | X     | 1 | TapiocaOptionBrokers - Lack of Minimum Duration for `tOLP` means people can l... |
+| 1246 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1246 | M  | P     | 3 | `TapiocaOptionLiquidityProvision` causes Loss of Yield when depositing and wi... |
+| 1247 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1247 | M  | P     | 1 | `TapiocaOptionLiquidityProvision` stores amount which cause Socialization of ... |
+| 1274 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1274 | M  | X     | 1 | Some Chainlink Oracle Validation is missing                                      |
+| 1275 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1275 | H  | D1021 | 2 | Oracle can revert in-spite of the fact that Liquidations would want to be exe... |
+| 1276 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1276 | M  | P     | 2 | Burning FlashFee breaks a core protocol invariant                                |
+| 1277 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1277 | M  | P     | 3 | Using `setBigBangEthMarketDebtRate` or `setBigBangConfig` cause incorrect int... |
+| 1278 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1278 | H  | D1043 | 8 | Max FlashLoan can be sidestepped by taking multiple Flashloans                   |
+| 1279 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1279 | QA | QA    | 1 | MaxFlashloan is not coded to spec, always returns `maxFlashMint`                 |
+| 1315 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1315 | QA | QA    | 1 | Funds in the AAVE Strategy can be blocked DOS by preventing withdraw             |
+| 1316 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1316 | QA | QA    | 1 | If the AAVE Lending Pool is paused, funds will be stuck and no-one will be ab... |
+| 1321 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1321 | M  | P     | 1 |  MEV Attack on `stkAAVE` causes the AaveStrategy to give away all of the Yield   |
+| 1324 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1324 | M  | D1330 | 8 | CompoundStrategy stale `_currentBalance` may cause incorrect liquidations        |
+| 1330 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1330 | M  | P     | 8 | CompoundStrategy `_currentBalance` uses `exchangeRateStored` which is leaks v... |
+| 1333 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1333 | M  | P     | 2 | a4185aaf2a0a953dd8ea2e7f62a58087c4cd5680bfbe8c3a749efef847af3c3b - Sent Priva... |
+| 1420 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1420 | M  | X     | 1 | ConvexTrycripto prices the LP token in WETH, allowing for Price Manipulation     |
+| 1421 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1421 | M  | X     | 1 | Claimer can Sandwhich all rewards                                                |
+| 1423 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1423 | M  | X     | 1 | Due to front-running and sanwhiching, normal users overpay for `ConvexTriCryp... |
+| 1425 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1425 | M  | P     | 2 | Convex `BaseRewardPool` allows Claim on Behalf which causes delta to break - ... |
+| 1428 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1428 | H  | P     | 1 | `TricryptoLPStrategy.compoundAmount` always returns 0 because it's using stat... |
+| 1429 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1429 | M  | P     | 1 | Curve Strategy Yield can be Lost by Griefing due to Delta Balance Check          |
+| 1430 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1430 | M  | P     | 1 | LidEthStrategys Hardcoded 2.5% slippage allows stealing all tokens above $2MLN   |
+| 1432 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1432 | H  | P     | 6 | `LidoEthStrategy._currentBalance` is subject to price manipulation, allows ov... |
+| 1434 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1434 | M  | X     | 1 | When stETH Depegs the strategy will not allow withdrawals                        |
+| 1437 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1437 | M  | P     | 1 | LidoETHStrategy buys stETH at 1-1 instead of buying it from the Pool at Discount |
+| 1447 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1447 | H  | P     | 4 | Usage of `BalancerStrategy.updateCache` will cause single sided Loss, discoun... |
+| 1449 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1449 | H  | P     | 1 | BalancerStrategy `_withdraw` uses `BPT_IN_FOR_EXACT_TOKENS_OUT` which can be ... |
+| 1456 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1456 | M  | P     | 7 | In case of Loss to the Yearn Vault, the Contract will stop working until the ... |
+| 1457 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1457 | M  | D1456 | 7 | YearnStrategy.emergencyWithdraw` has a hardcoded 0 loss, this can cause rever... |
+| 1459 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1459 | M  | P     | 1 | `YearnStrategy` is ignoring the `lockedProfits`, giving away all of the Yield... |
+| 1540 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1540 | M  | D805  | 3 | `StargateStrategy` Delta Balance in compound means some rewards are lost         |
+| 1553 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1553 | M  | P     | 4 | Single UniswapV3Swapper using a single fee makes it highly likely to be subop... |
+| 1561 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1561 | M  | P     | 1 | `getDebtRate()` is view and reads `ethMarket.getTotalDebt` allowing for manip... |
+| 1565 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1565 | A  | A     | 1 | Analysis                                                                         |
+| 1578 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1578 | QA | QA    | 1 | QA Report                                                                        |
+| 1592 | https://github.com/code-423n4/2023-07-tapioca-findings/issues/1592 | M  | X     | 1 | Front-run grief in `participate` preventing people from gaining voting power     |
 
 Found 45 issues from GalloDaSballo in 2023-07-tapioca-findings repo
 
-Legend: P - Primary, D{num} - Duplicate, X - Rejected, QA - Quality Assurance, A - Analysis
-
+Severity Legend: H - High Risk, M - Medium Risk, QA - Quality Assurance, A - Analysis, G - Gas Optimization
+Status Legend: P - Primary, D{num} - Duplicate, X - Rejected, QA - Quality Assurance, A - Analysis
