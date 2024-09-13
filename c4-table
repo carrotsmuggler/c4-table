@@ -9,67 +9,74 @@ import concurrent.futures
 import itertools
 from collections import defaultdict
 
+
 # %% Argument Handler
-# Parse arguments
-parser = argparse.ArgumentParser(
-    description="Generate markdown table of issues from repo link and username on code4rena",
-    epilog="Example: c4-table 2024-02-hydradx carrotsmuggler\n"
-    "Please make sure gh (github cli) is installed and logged in with access to code4rena backstage",
-    formatter_class=RawTextHelpFormatter,
-)
-parser.add_argument(
-    "repo_link",
-    help="Link to the repo. Accepts one of the following:\n"
-    " 1. http link to the findings repo\n"
-    " 2. Name of the contest repo\n"
-    " 3. Name of the findings repo",
-)
-parser.add_argument(
-    "username",
-    nargs="?",
-    default=None,
-    type=str,
-    help="case sensitive username to search for",
-)
-parser.add_argument(
-    "-v", "--verbose", help="increase output verbosity", action="store_true"
-)
-parser.add_argument(
-    "-l", "--links-only", help="Only lists html links, very fast", action="store_true"
-)
-parser.add_argument(
-    "-u", "--user-stats", help="List all user stats", action="store_true"
-)
-parser.add_argument(
-    "-p",
-    "--primary-issues",
-    help="List all primary/selected for report issues",
-    action="store_true",
-)
-args = parser.parse_args()
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        description="Generate markdown table of issues from repo link and username on code4rena",
+        epilog="Example: c4-table 2024-02-hydradx carrotsmuggler\n"
+        "Please make sure gh (github cli) is installed and logged in with access to code4rena backstage",
+        formatter_class=RawTextHelpFormatter,
+    )
+    parser.add_argument(
+        "repo_link",
+        help="Link to the repo. Accepts one of the following:\n"
+        " 1. http link to the findings repo\n"
+        " 2. Name of the contest repo\n"
+        " 3. Name of the findings repo",
+    )
+    parser.add_argument(
+        "username",
+        nargs="?",
+        default=None,
+        type=str,
+        help="case sensitive username to search for",
+    )
+    parser.add_argument(
+        "-v", "--verbose", help="increase output verbosity", action="store_true"
+    )
+    parser.add_argument(
+        "-l",
+        "--links-only",
+        help="Only lists html links, very fast",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-u", "--user-stats", help="List all user stats", action="store_true"
+    )
+    parser.add_argument(
+        "-p",
+        "--primary-issues",
+        help="List all primary/selected for report issues",
+        action="store_true",
+    )
+    return parser.parse_args()
+
+
+# Use the function to parse arguments
+args = parse_arguments()
 
 
 # %% Helper functions
 # Fetch file list
 def fetch_list(owner, repo):
-    # gh command. Ensure gh is installed and logged in
     command = f"gh api '/repos/{owner}/{repo}/git/trees/main?recursive=true' -q '.tree[]|.path'"
     if args.verbose:
         print(command)
-    process = subprocess.Popen(
-        command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    stdout, stderr = process.communicate()
+
+    process = subprocess.run(command, shell=True, capture_output=True, text=True)
+
     if process.returncode != 0:
         print(
-            f"Error occurred: Is gh cli installed and logged in with correct user? \n {stderr.decode()}"
+            f"Error occurred: Is gh cli installed and logged in with correct user? \n {process.stderr}"
         )
-    else:
-        if args.verbose:
-            print(f"Success getting file list")
-    result = stdout.decode().strip().split("\n")
+        return None, 0
 
-    # Remove non subs
+    if args.verbose:
+        print("Success getting file list")
+
+    result = process.stdout.strip().split("\n")
+
     filtered_elements = [
         element
         for element in result
@@ -79,42 +86,42 @@ def fetch_list(owner, repo):
 
     issuenum_by_user = defaultdict(list)
 
-    # Iterate over the filtered elements
     for element in filtered_elements:
-        # Use a regular expression to match the username and issue number
         match = re.match(r"data/(?P<username>.+)-(?P<number>\d+)\.json", element)
         if match:
-            # Extract the username and issue number from the match
             temp_username = match.group("username")
             temp_num = int(match.group("number"))
-            # Add the issue number to the list for this username
             issuenum_by_user[temp_username].append(temp_num)
 
-    # Sort the issue numbers for each user
     for numbers in issuenum_by_user.values():
         numbers.sort()
+
     return issuenum_by_user, issues_count
 
 
 # Fetch issues
-def fetch_issues(page_num, responses_per_page):
-    command = f'gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "/repos/{owner}/{repo}/issues?state=all&page={page_num}&per_page={responses_per_page}"'
-    process = subprocess.Popen(
-        command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+def fetch_issues(page_num, responses_per_page, owner, repo):
+    command = (
+        f'gh api -H "Accept: application/vnd.github+json" '
+        f'-H "X-GitHub-Api-Version: 2022-11-28" '
+        f'"/repos/{owner}/{repo}/issues?state=all&page={page_num}&per_page={responses_per_page}"'
     )
-    stdout, stderr = process.communicate()
+
+    process = subprocess.run(command, shell=True, capture_output=True, text=True)
+
     if process.returncode != 0:
-        print(f"Error grabbing issue data. Querying: {command} \n {stderr.decode()}")
-    else:
-        if args.verbose:
-            print(f"Success getting issue list page: {page_num}")
-    # Decode stdout from bytes to string
-    stdout_str = stdout.decode("utf-8")
+        print(f"Error grabbing issue data. Querying: {command}\n{process.stderr}")
+        return []
+
+    if args.verbose:
+        print(f"Success getting issue list page: {page_num}")
+
     # Strip ANSI escape codes
     ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
-    stdout_str = ansi_escape.sub("", stdout_str)
+    cleaned_output = ansi_escape.sub("", process.stdout)
+
     # Convert string to JSON
-    return json.loads(stdout_str)
+    return json.loads(cleaned_output)
 
 
 # Display
@@ -128,7 +135,7 @@ def print_table(
     username="",
     repo="",
 ):
-    # Find the largest length
+    # Calculate maximum lengths
     number = max(
         len(numbers), len(urls), len(titles), len(status), len(dupes), len(severities)
     )
@@ -142,46 +149,36 @@ def print_table(
         max(len(s) for s in severities if s) if severities and any(severities) else 0
     )
     max_title_length = min(max(len(s) for s in titles), 80) if titles else 0
+
+    def format_column(value, index):
+        if index == 0:  # Num
+            return f" {str(value).ljust(max_num_length)} "
+        elif index == 1:  # URL
+            return f" {str(value).ljust(url_length + max_num_length)} "
+        elif index == 2:  # Severity
+            return f" {str(value).ljust(max_severity_length)} "
+        elif index == 3:  # Status
+            return f" {str(value).ljust(max_status_length)} "
+        elif index == 4:  # Occurences
+            return f" {str(value).ljust(max_dupe_length)} "
+        elif index == 5:  # Title
+            return f" {str(value[:77] + '...' if len(str(value)) > 80 else str(value)).ljust(max_title_length)} "
+        return str(value)
+
     combined_table = [
-        "|"
-        + "|".join(
-            (
-                f" {str(el).ljust(max_num_length)} "
-                if i == 0
-                else (
-                    f" {str(el).ljust(url_length + max_num_length)} "
-                    if i == 1
-                    else (
-                        f" {str(el).ljust(max_severity_length)} "
-                        if i == 2
-                        else (
-                            f" {str(el).ljust(max_status_length)} "
-                            if i == 3
-                            else (
-                                f" {str(el).ljust(max_dupe_length)} "
-                                if i == 4
-                                else (
-                                    f" {str(el[:77]) + '...' if len(str(el)) > 80 else str(el).ljust(max_title_length)} "
-                                    if i == 5
-                                    else str(el)
-                                )
-                            )
-                        )
-                    )
-                )
-            )
-            for i, el in enumerate(elements)
-        )
-        + "|"
+        "|" + "|".join(format_column(el, i) for i, el in enumerate(elements)) + "|"
         for elements in itertools.zip_longest(
             numbers, urls, severities, status, dupes, titles, fillvalue=""
         )
     ]
+
     combined_table.insert(0, "| Num | URL | Severity | Status | Occurences | Title |")
     combined_table.insert(1, "| :-: | :-: | :-: | :-: | :-: | :-: |")
+
     if args.verbose:
         print("\n")
     print("\n".join(combined_table))
+
     if number > 0:
         print(f"\nFound {number} issues from {username} in {repo} repo\n")
     print(
@@ -213,32 +210,41 @@ issuenum_by_user, issues_count = fetch_list(owner, repo)
 
 
 # %% Early exits
-# Only links (No issue parsing)
-if args.links_only:
+def handle_links_only(issuenum_by_user, args, owner, repo):
     username = args.username
     if not username:
         print("Username not provided")
-        quit()
+        return
+
     issue_numbers = issuenum_by_user[username]
     url_list = [
         f"https://github.com/{owner}/{repo}/issues/{element}"
         for element in issue_numbers
     ]
     print_table(numbers=issue_numbers, urls=url_list, username=username, repo=repo)
-    quit()
 
-if args.user_stats:
+
+def handle_user_stats(issuenum_by_user, issues_count):
     print(f"{'Username':<20} | {'Number of issues'}")
     print(f"{'-'*20} | {'-'*15}")
-    # Sort the dictionary by the length of the issue numbers list
+
     sorted_issuenum_by_user = sorted(
         issuenum_by_user.items(), key=lambda item: len(item[1])
     )
-    # Iterate over the sorted dictionary and print the username and number of issues
+
     for username, issue_numbers in sorted_issuenum_by_user:
-        # print(f"User {username} submitted {len(issue_numbers)} issues")
         print(f"{username:<20} | {len(issue_numbers)} ")
+
     print(f"Total {issues_count} issues submitted by {len(issuenum_by_user)} users")
+
+
+# Main early exit logic
+if args.links_only:
+    handle_links_only(issuenum_by_user, args, owner, repo)
+    quit()
+
+if args.user_stats:
+    handle_user_stats(issuenum_by_user, issues_count)
     quit()
 
 
@@ -249,7 +255,7 @@ pages = (issues_count // responses_per_page) + 1
 issues_list = []
 with concurrent.futures.ThreadPoolExecutor(max_workers=min(pages + 1, 25)) as executor:
     futures = [
-        executor.submit(fetch_issues, page_num, responses_per_page)
+        executor.submit(fetch_issues, page_num, responses_per_page, owner, repo)
         for page_num in range(1, pages + 1)
     ]
     results = [future.result() for future in concurrent.futures.as_completed(futures)]
