@@ -9,6 +9,13 @@ import concurrent.futures
 import itertools
 from collections import defaultdict
 
+# Constants for label names
+LABEL_QA = "QA (Quality Assurance)"
+LABEL_ANALYSIS = "analysis-advanced"
+LABEL_GAS = "G (Gas Optimization)"
+LABEL_HIGH_RISK = "3 (High Risk)"
+LABEL_MED_RISK = "2 (Med Risk)"
+
 # %% Argument Handler
 # Parse arguments
 parser = argparse.ArgumentParser(
@@ -119,15 +126,27 @@ def fetch_issues(page_num, responses_per_page):
 
 # Display
 def print_table(
-    numbers=[], urls=[], titles=[], status=[], dupes=[], username="", repo=""
+    numbers=[],
+    urls=[],
+    titles=[],
+    status=[],
+    dupes=[],
+    severities=[],
+    username="",
+    repo="",
 ):
     # Find the largest length
-    number = max(len(numbers), len(urls), len(titles), len(status), len(dupes))
+    number = max(
+        len(numbers), len(urls), len(titles), len(status), len(dupes), len(severities)
+    )
     url_length = len(urls[0]) - len(str(numbers[0])) if urls else 0
     max_num_length = len(str(numbers[-1])) if numbers else 0
     max_dupe_length = len(str(max(dupes))) if dupes else 0
     max_status_length = (
         max(len(s) for s in status if s) if status and any(status) else 0
+    )
+    max_severity_length = (
+        max(len(s) for s in severities if s) if severities and any(severities) else 0
     )
     max_title_length = min(max(len(s) for s in titles), 80) if titles else 0
     combined_table = [
@@ -146,9 +165,13 @@ def print_table(
                             f" {str(el).ljust(max_dupe_length)} "
                             if i == 3
                             else (
-                                f" {str(el[:77]) + '...' if len(str(el)) > 80 else str(el).ljust(max_title_length)} "
+                                f" {str(el).ljust(max_severity_length)} "
                                 if i == 4
-                                else str(el)
+                                else (
+                                    f" {str(el[:77]) + '...' if len(str(el)) > 80 else str(el).ljust(max_title_length)} "
+                                    if i == 5
+                                    else str(el)
+                                )
                             )
                         )
                     )
@@ -158,11 +181,11 @@ def print_table(
         )
         + "|"
         for elements in itertools.zip_longest(
-            numbers, urls, status, dupes, titles, fillvalue=""
+            numbers, urls, status, dupes, severities, titles, fillvalue=""
         )
     ]
-    combined_table.insert(0, "| Num | URL | Status | Occurences | Title |")
-    combined_table.insert(1, "| :-: | :-: | :-: | :-: | :-: | ")
+    combined_table.insert(0, "| Num | URL | Status | Occurences | Severity | Title |")
+    combined_table.insert(1, "| :-: | :-: | :-: | :-: | :-: | :-: |")
     if args.verbose:
         print("\n")
     print("\n".join(combined_table))
@@ -245,44 +268,60 @@ issues_arr = [None] * modified_length
 issues_parent = [None] * modified_length
 dupes_list = [1] * modified_length
 acceptance = [None] * modified_length
+severities = [None] * modified_length
 primary_issues = []
 for issue in issues_list:
     issues_arr[issue["number"]] = issue
     issues_parent[issue["number"]] = issue["number"]
+
+    # First loop: Process labels for acceptance
     for label in issue["labels"]:
-        if (
-            label["name"] == "insufficient quality report"
-            or label["name"] == "low quality report"
-            or label["name"] == "out of scope"
-            or label["name"] == "unsatisfactory"
-            or label["name"] == "invalid"
-            or label["name"] == "nullified"
-        ):
+        if label["name"] in [
+            "insufficient quality report",
+            "low quality report",
+            "out of scope",
+            "unsatisfactory",
+            "invalid",
+            "nullified",
+        ]:
             acceptance[issue["number"]] = "X"
             break
+        elif label["name"] == LABEL_QA:
+            acceptance[issue["number"]] = "QA"
+            break
+        elif label["name"] == LABEL_ANALYSIS:
+            acceptance[issue["number"]] = "A"
+            break
+        elif label["name"] == LABEL_GAS:
+            acceptance[issue["number"]] = "G"
+            break
+        elif label["name"] in [
+            "confirmed for report",
+            "selected for report",
+            "primary issue",
+        ]:
+            acceptance[issue["number"]] = "P"
         else:
-            if label["name"] == "QA (Quality Assurance)":
-                acceptance[issue["number"]] = "QA"
-                break
-            if label["name"] == "analysis-advanced":
-                acceptance[issue["number"]] = "A"
-                break
-            if label["name"] == "G (Gas Optimization)":
-                acceptance[issue["number"]] = "G"
-                break
-            if (
-                label["name"] == "confirmed for report"
-                or label["name"] == "selected for report"
-                or label["name"] == "primary issue"
-            ):
-                acceptance[issue["number"]] = "P"
-                continue
             match = re.match(r"duplicate-(\d+)", label["name"])
             if match:
                 issues_parent[issue["number"]] = int(match.group(1))
                 dupes_list[int(match.group(1))] += 1
                 acceptance[issue["number"]] = f"D{int(match.group(1))}"
-                continue
+
+    # Second loop: Process all labels for severity
+    severities[issue["number"]] = "X"  # Default to X if no other severity is found
+    for label in issue["labels"]:
+        if label["name"] == LABEL_HIGH_RISK:
+            severities[issue["number"]] = "H"
+        elif label["name"] == LABEL_MED_RISK:
+            severities[issue["number"]] = "M"
+        elif label["name"] == LABEL_QA:
+            severities[issue["number"]] = "QA"
+        elif label["name"] == LABEL_ANALYSIS:
+            severities[issue["number"]] = "A"
+        elif label["name"] == LABEL_GAS:
+            severities[issue["number"]] = "G"
+
     if acceptance[issue["number"]] == "P":
         primary_issues.append(issue["number"])
 
@@ -294,6 +333,7 @@ if args.primary_issues:
     title_list = [issues_arr[element]["title"] for element in num_list]
     dupes_list_user = [dupes_list[issues_parent[element]] for element in num_list]
     acceptance_list = [acceptance[element] for element in num_list]
+    severity_list = [severities[element] for element in num_list]
     print_table(
         numbers=num_list,
         urls=url_list,
@@ -301,6 +341,7 @@ if args.primary_issues:
         username="Primary Issues",
         dupes=dupes_list_user,
         status=acceptance_list,
+        severities=severity_list,
         repo=repo,
     )
     quit()
@@ -320,6 +361,7 @@ num_list = [
 ]
 dupes_list_user = [dupes_list[issues_parent[element]] for element in issue_numbers]
 acceptance_list = [acceptance[element] for element in issue_numbers]
+severity_list = [severities[element] for element in issue_numbers]
 
 # %% Table output
 print_table(
@@ -329,5 +371,6 @@ print_table(
     username=username,
     dupes=dupes_list_user,
     status=acceptance_list,
+    severities=severity_list,
     repo=repo,
 )
