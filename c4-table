@@ -9,13 +9,6 @@ import concurrent.futures
 import itertools
 from collections import defaultdict
 
-# Constants for label names
-LABEL_QA = "QA (Quality Assurance)"
-LABEL_ANALYSIS = "analysis-advanced"
-LABEL_GAS = "G (Gas Optimization)"
-LABEL_HIGH_RISK = "3 (High Risk)"
-LABEL_MED_RISK = "2 (Med Risk)"
-
 # %% Argument Handler
 # Parse arguments
 parser = argparse.ArgumentParser(
@@ -159,13 +152,13 @@ def print_table(
                     f" {str(el).ljust(url_length + max_num_length)} "
                     if i == 1
                     else (
-                        f" {str(el).ljust(max_status_length)} "
+                        f" {str(el).ljust(max_severity_length)} "
                         if i == 2
                         else (
-                            f" {str(el).ljust(max_dupe_length)} "
+                            f" {str(el).ljust(max_status_length)} "
                             if i == 3
                             else (
-                                f" {str(el).ljust(max_severity_length)} "
+                                f" {str(el).ljust(max_dupe_length)} "
                                 if i == 4
                                 else (
                                     f" {str(el[:77]) + '...' if len(str(el)) > 80 else str(el).ljust(max_title_length)} "
@@ -181,10 +174,10 @@ def print_table(
         )
         + "|"
         for elements in itertools.zip_longest(
-            numbers, urls, status, dupes, severities, titles, fillvalue=""
+            numbers, urls, severities, status, dupes, titles, fillvalue=""
         )
     ]
-    combined_table.insert(0, "| Num | URL | Status | Occurences | Severity | Title |")
+    combined_table.insert(0, "| Num | URL | Severity | Status | Occurences | Title |")
     combined_table.insert(1, "| :-: | :-: | :-: | :-: | :-: | :-: |")
     if args.verbose:
         print("\n")
@@ -192,7 +185,10 @@ def print_table(
     if number > 0:
         print(f"\nFound {number} issues from {username} in {repo} repo\n")
     print(
-        "Legend: P - Primary, D{num} - Duplicate, X - Rejected, QA - Quality Assurance, A - Analysis\n"
+        "Severity Legend: H - High Risk, M - Medium Risk, QA - Quality Assurance, A - Analysis, G - Gas Optimization"
+    )
+    print(
+        "Status Legend: P - Primary, D{num} - Duplicate, X - Rejected, QA - Quality Assurance, A - Analysis"
     )
 
 
@@ -286,13 +282,13 @@ for issue in issues_list:
         ]:
             acceptance[issue["number"]] = "X"
             break
-        elif label["name"] == LABEL_QA:
+        elif label["name"] == "QA (Quality Assurance)":
             acceptance[issue["number"]] = "QA"
             break
-        elif label["name"] == LABEL_ANALYSIS:
+        elif label["name"] == "analysis-advanced":
             acceptance[issue["number"]] = "A"
             break
-        elif label["name"] == LABEL_GAS:
+        elif label["name"] == "G (Gas Optimization)":
             acceptance[issue["number"]] = "G"
             break
         elif label["name"] in [
@@ -311,15 +307,15 @@ for issue in issues_list:
     # Second loop: Process all labels for severity
     severities[issue["number"]] = "X"  # Default to X if no other severity is found
     for label in issue["labels"]:
-        if label["name"] == LABEL_HIGH_RISK:
+        if label["name"] == "3 (High Risk)":
             severities[issue["number"]] = "H"
-        elif label["name"] == LABEL_MED_RISK:
+        elif label["name"] == "2 (Med Risk)":
             severities[issue["number"]] = "M"
-        elif label["name"] == LABEL_QA:
+        elif label["name"] == "QA (Quality Assurance)":
             severities[issue["number"]] = "QA"
-        elif label["name"] == LABEL_ANALYSIS:
+        elif label["name"] == "analysis-advanced":
             severities[issue["number"]] = "A"
-        elif label["name"] == LABEL_GAS:
+        elif label["name"] == "G (Gas Optimization)":
             severities[issue["number"]] = "G"
 
     if acceptance[issue["number"]] == "P":
