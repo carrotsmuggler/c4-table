@@ -1,29 +1,28 @@
 #!/usr/bin/env python3
-import subprocess
-from urllib.parse import urlparse
-import re
-import argparse
-from argparse import RawTextHelpFormatter
+import os
 import json
-import concurrent.futures
+import argparse
 import itertools
+import requests
+import concurrent.futures
+from urllib.parse import urlparse
+from argparse import RawTextHelpFormatter
 from collections import defaultdict
 
 
 # %% Argument Handler
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        description="Generate markdown table of issues from repo link and username on code4rena",
-        epilog="Example: c4-table 2024-02-hydradx carrotsmuggler\n"
-        "Please make sure gh (github cli) is installed and logged in with access to code4rena backstage",
+        description="Generate markdown table of submissions from Code4rena API for a slug and username",
+        epilog="Example: c4-table 2025-06-chainlink-rewards random1106\n"
+        "Requires C4AUTH_LOGIN cookie in the environment",
         formatter_class=RawTextHelpFormatter,
     )
     parser.add_argument(
-        "repo_link",
-        help="Link to the repo. Accepts one of the following:\n"
-        " 1. http link to the findings repo\n"
-        " 2. Name of the contest repo\n"
-        " 3. Name of the findings repo",
+        "contest_ref",
+        help="Contest reference. Accepts one of the following:\n"
+        " 1. Code4rena contest URL (e.g., https://code4rena.com/audits/2025-06-chainlink-rewards)\n"
+        " 2. Contest slug (e.g., 2025-06-chainlink-rewards)",
     )
     parser.add_argument(
         "username",
@@ -36,18 +35,12 @@ def parse_arguments():
         "-v", "--verbose", help="increase output verbosity", action="store_true"
     )
     parser.add_argument(
-        "-l",
-        "--links-only",
-        help="Only lists html links, very fast",
-        action="store_true",
-    )
-    parser.add_argument(
         "-u", "--user-stats", help="List all user stats", action="store_true"
     )
     parser.add_argument(
         "-p",
-        "--primary-issues",
-        help="List all primary/selected for report issues",
+        "--primary",
+        help="List all primary/selected submissions",
         action="store_true",
     )
     return parser.parse_args()
@@ -59,69 +52,89 @@ args = parse_arguments()
 
 # %% Helper functions
 # Fetch file list
-def fetch_list(owner, repo):
-    command = f"gh api '/repos/{owner}/{repo}/git/trees/main?recursive=true' -q '.tree[]|.path'"
-    if args.verbose:
-        print(command)
+def _require_cookie():
+    cookie = os.getenv("C4AUTH_LOGIN")
+    if not cookie:
+        print("C4AUTH_LOGIN environment variable not found. Set it from your browser cookie.")
+        exit(1)
+    return cookie
 
-    process = subprocess.run(command, shell=True, capture_output=True, text=True)
+def _fetch_submissions(slug):
+    cookie = _require_cookie()
+    headers = {
+        "content-type": "application/json",
+        "cookie": f"C4AUTH-LOGIN={cookie}",
+    }
+    def fetch_page(session, page):
+        url = f"https://code4rena.com/api/v1/audits/{slug}/submissions?perPage=100&page={page}"
+        resp = session.get(url, headers=headers)
+        if resp.status_code != 200:
+            try:
+                body = resp.json()
+            except Exception:
+                body = resp.text
+            raise RuntimeError(f"HTTP {resp.status_code} page {page}: {body}")
+        data = resp.json()
+        subs = data.get("data", {}).get("submissions", data.get("data", []))
+        if not isinstance(subs, list):
+            subs = []
+        pagination = data.get("pagination", {})
+        return subs, pagination
 
-    if process.returncode != 0:
-        print(
-            f"Error occurred: Is gh cli installed and logged in with correct user? \n {process.stderr}"
-        )
-        return None, 0
+    submissions = []
+    with requests.Session() as session:
+        try:
+            subs, pagination = fetch_page(session, 1)
+        except Exception as e:
+            print(f"Error fetching submissions: {e}")
+            exit(1)
+        submissions.extend(subs)
+        last_page = pagination.get("lastPage", 1) or 1
+        if last_page > 1:
+            pages = list(range(2, last_page + 1))
+            with concurrent.futures.ThreadPoolExecutor(max_workers=min(8, len(pages))) as ex:
+                futures = {ex.submit(fetch_page, session, p): p for p in pages}
+                for fut in concurrent.futures.as_completed(futures):
+                    p = futures[fut]
+                    try:
+                        subs, _ = fut.result()
+                        submissions.extend(subs)
+                    except Exception as e:
+                        print(f"Error fetching page {p}: {e}")
+                        exit(1)
+    return submissions
 
-    if args.verbose:
-        print("Success getting file list")
-
-    result = process.stdout.strip().split("\n")
-
-    filtered_elements = [
-        element
-        for element in result
-        if not element.endswith(("Analysis.md", "Q.md", "G.md", "README.md"))
-    ]
-    issues_count = len(filtered_elements)
-
+def fetch_list(owner, repo_or_slug):
+    # Interpret input as slug and build mapping username -> [submission numbers]
+    slug = repo_or_slug
+    subs = _fetch_submissions(slug)
     issuenum_by_user = defaultdict(list)
-
-    for element in filtered_elements:
-        match = re.match(r"data/(?P<username>.+)-(?P<number>\d+)\.json", element)
-        if match:
-            temp_username = match.group("username")
-            temp_num = int(match.group("number"))
-            issuenum_by_user[temp_username].append(temp_num)
-
+    for s in subs:
+        # If a submission belongs to a team, index it ONLY under the team handle.
+        # Otherwise, index it under the individual user handle.
+        handles = []
+        team = s.get("team") or {}
+        team_handle = team.get("handle")
+        if team_handle:
+            handles = [team_handle]
+        else:
+            user_handle = (s.get("user") or {}).get("handle")
+            if user_handle:
+                handles = [user_handle]
+        num = s.get("number")
+        if isinstance(num, int):
+            for h in handles:
+                if num not in issuenum_by_user[h]:
+                    issuenum_by_user[h].append(num)
     for numbers in issuenum_by_user.values():
         numbers.sort()
-
-    return issuenum_by_user, issues_count
+    return issuenum_by_user, len(subs)
 
 
 # Fetch issues
-def fetch_issues(page_num, responses_per_page, owner, repo):
-    command = (
-        f'gh api -H "Accept: application/vnd.github+json" '
-        f'-H "X-GitHub-Api-Version: 2022-11-28" '
-        f'"/repos/{owner}/{repo}/issues?state=all&page={page_num}&per_page={responses_per_page}"'
-    )
-
-    process = subprocess.run(command, shell=True, capture_output=True, text=True)
-
-    if process.returncode != 0:
-        print(f"Error grabbing issue data. Querying: {command}\n{process.stderr}")
-        return []
-
-    if args.verbose:
-        print(f"Success getting issue list page: {page_num}")
-
-    # Strip ANSI escape codes
-    ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
-    cleaned_output = ansi_escape.sub("", process.stdout)
-
-    # Convert string to JSON
-    return json.loads(cleaned_output)
+def fetch_issues(page_num, responses_per_page, owner, repo_or_slug):
+    # Deprecated path (GitHub). Intentionally unused.
+    return []
 
 
 # Display
@@ -133,7 +146,7 @@ def print_table(
     dupes=[],
     severities=[],
     username="",
-    repo="",
+    contest="",
 ):
     # Calculate maximum lengths
     number = max(
@@ -180,52 +193,33 @@ def print_table(
     print("\n".join(combined_table))
 
     if number > 0:
-        print(f"\nFound {number} issues from {username} in {repo} repo\n")
+        print(f"\nFound {number} submissions from {username} in {contest}\n")
     print(
-        "Severity Legend: H - High Risk, M - Medium Risk, QA - Quality Assurance, A - Analysis, G - Gas Optimization"
+        "Severity Legend: H - High Risk, M - Medium Risk, QA - Quality Assurance"
     )
     print(
-        "Status Legend: P - Primary, D{num} - Duplicate, X - Rejected, QA - Quality Assurance, A - Analysis"
+        "Status Legend: P - Primary, D{num} - Duplicate, X - Rejected"
     )
 
 
-# %% Fetch file list and issue numbers
-# Parse repo link
-http_url = args.repo_link
-if http_url[0] == "2":
-    owner = "code-423n4"
-    if http_url.endswith("findings"):
-        repo = http_url
-    else:
-        repo = http_url + "-findings"
-else:
-    # Parse the URL
+# %% Fetch list and submission numbers from Code4rena API
+# Parse input and derive slug
+http_url = args.contest_ref
+if http_url.startswith("http"):
     parsed_url = urlparse(http_url)
-    # Extract the owner and repo
-    path_parts = parsed_url.path.strip("/").split("/")
-    owner = path_parts[0]
-    repo = path_parts[1]
+    parts = parsed_url.path.strip("/").split("/")
+    repo_name = parts[1] if len(parts) > 1 else parts[0]
+    slug = repo_name[:-9] if repo_name.endswith("-findings") else repo_name
+else:
+    slug = http_url
 
-issuenum_by_user, issues_count = fetch_list(owner, repo)
+owner = "code4rena"
 
-
-# %% Early exits
-def handle_links_only(issuenum_by_user, args, owner, repo):
-    username = args.username
-    if not username:
-        print("Username not provided")
-        return
-
-    issue_numbers = issuenum_by_user[username]
-    url_list = [
-        f"https://github.com/{owner}/{repo}/issues/{element}"
-        for element in issue_numbers
-    ]
-    print_table(numbers=issue_numbers, urls=url_list, username=username, repo=repo)
+issuenum_by_user, issues_count = fetch_list(owner, slug)
 
 
 def handle_user_stats(issuenum_by_user, issues_count):
-    print(f"{'Username':<20} | {'Number of issues'}")
+    print(f"{'Username':<20} | {'Number of submissions'}")
     print(f"{'-'*20} | {'-'*15}")
 
     sorted_issuenum_by_user = sorted(
@@ -235,103 +229,92 @@ def handle_user_stats(issuenum_by_user, issues_count):
     for username, issue_numbers in sorted_issuenum_by_user:
         print(f"{username:<20} | {len(issue_numbers)} ")
 
-    print(f"Total {issues_count} issues submitted by {len(issuenum_by_user)} users")
+    print(f"Total {issues_count} submissions submitted by {len(issuenum_by_user)} users")
 
-
-# Main early exit logic
-if args.links_only:
-    handle_links_only(issuenum_by_user, args, owner, repo)
-    quit()
 
 if args.user_stats:
     handle_user_stats(issuenum_by_user, issues_count)
     quit()
 
 
-# %% Fetch issue details
-# Get paginated issue details
-responses_per_page = 100
-pages = (issues_count // responses_per_page) + 1
-issues_list = []
-with concurrent.futures.ThreadPoolExecutor(max_workers=min(pages + 1, 25)) as executor:
-    futures = [
-        executor.submit(fetch_issues, page_num, responses_per_page, owner, repo)
-        for page_num in range(1, pages + 1)
-    ]
-    results = [future.result() for future in concurrent.futures.as_completed(futures)]
-# Combine results into issues_list
-for result in results:
-    issues_list.extend(result)
-issues_list.sort(key=lambda issue: issue["number"])
+# %% Fetch submission details (single pass via API)
+submissions = _fetch_submissions(slug)
+submissions.sort(key=lambda s: s.get("number", 0))
 
 # convert issues into an array and find parent issues
-modified_length = len(issues_list) + 10
-issues_arr = [None] * modified_length
-issues_parent = [None] * modified_length
-dupes_list = [1] * modified_length
-acceptance = [None] * modified_length
-severities = [None] * modified_length
+issues_arr = {}
+issues_parent = {}
+dupes_list = defaultdict(lambda: 1)
+acceptance = {}
+severities = {}
 primary_issues = []
-for issue in issues_list:
-    issues_arr[issue["number"]] = issue
-    issues_parent[issue["number"]] = issue["number"]
 
-    # First loop: Process labels for acceptance
-    for label in issue["labels"]:
-        if label["name"] in [
-            "insufficient quality report",
-            "low quality report",
-            "out of scope",
-            "unsatisfactory",
-            "invalid",
-            "nullified",
-        ]:
-            acceptance[issue["number"]] = "X"
-            break
-        elif label["name"] == "QA (Quality Assurance)":
-            acceptance[issue["number"]] = "QA"
-            break
-        elif label["name"] == "analysis-advanced":
-            acceptance[issue["number"]] = "A"
-            break
-        elif label["name"] == "G (Gas Optimization)":
-            acceptance[issue["number"]] = "G"
-            break
-        elif label["name"] in [
-            "confirmed for report",
-            "selected for report",
-            "primary issue",
-        ]:
-            acceptance[issue["number"]] = "P"
-        else:
-            match = re.match(r"duplicate-(\d+)", label["name"])
-            if match:
-                issues_parent[issue["number"]] = int(match.group(1))
-                dupes_list[int(match.group(1))] += 1
-                acceptance[issue["number"]] = f"D{int(match.group(1))}"
+# Build a mapping from finding uid to its primary submission number and dup count
+primary_by_finding = {}
+dups_by_finding = {}
+for s in submissions:
+    f = s.get("finding") or {}
+    fuid = f.get("uid")
+    if not isinstance(s.get("number"), int):
+        continue
+    if fuid:
+        if f.get("duplicates") is not None:
+            dups_by_finding[fuid] = f.get("duplicates")
+        if s.get("isPrimary"):
+            primary_by_finding[fuid] = s.get("number")
 
-    # Second loop: Process all labels for severity
-    severities[issue["number"]] = "X"  # Default to X if no other severity is found
-    for label in issue["labels"]:
-        if label["name"] == "3 (High Risk)":
-            severities[issue["number"]] = "H"
-        elif label["name"] == "2 (Med Risk)":
-            severities[issue["number"]] = "M"
-        elif label["name"] == "QA (Quality Assurance)":
-            severities[issue["number"]] = "QA"
-        elif label["name"] == "analysis-advanced":
-            severities[issue["number"]] = "A"
-        elif label["name"] == "G (Gas Optimization)":
-            severities[issue["number"]] = "G"
+for s in submissions:
+    num = s.get("number")
+    if not isinstance(num, int):
+        continue
+    issues_arr[num] = s
+    f = s.get("finding") or {}
+    fuid = f.get("uid")
+    primary_num = primary_by_finding.get(fuid)
+    issues_parent[num] = primary_num if primary_num is not None else num
 
-    if acceptance[issue["number"]] == "P":
-        primary_issues.append(issue["number"])
+    # Acceptance/status
+    # Prioritize invalid over primary. If submission is invalid, mark as X even if isPrimary.
+    validity = (s.get("latestEvaluations") or {}).get("validity")
+    if validity is None:
+        for ev in (s.get("evaluations") or []):
+            if ev.get("type") == "validity":
+                validity = ev.get("value")
+    status = None
+    vlower = validity.lower() if isinstance(validity, str) else ""
+    if vlower in ("invalid", "out of scope"):
+        status = "X"
+    elif s.get("isPrimary"):
+        status = "P"
+    elif primary_num is not None:
+        status = f"D{primary_num}"
+    else:
+        status = "D"
+    acceptance[num] = status
+
+    # Severity: prefer latestEvaluations.severity; map 'low'/'qa' -> 'QA'
+    sev_raw = (s.get("latestEvaluations") or {}).get("severity") or s.get("severity") or ""
+    sev_lower = str(sev_raw).lower()
+    if sev_lower == "high":
+        sev_code = "H"
+    elif sev_lower == "medium":
+        sev_code = "M"
+    elif sev_lower in ("low", "qa"):
+        sev_code = "QA"
+    else:
+        sev_code = "X"
+    severities[num] = sev_code
+
+    if s.get("isPrimary"):
+        primary_issues.append(num)
+        if fuid in dups_by_finding:
+            dupes_list[num] = dups_by_finding[fuid]
 
 # %% Primary issues/ Report generation
 # Get all issues marked P (selected for report, or primary issues)
-if args.primary_issues:
+if args.primary:
     num_list = [element for element in primary_issues]
-    url_list = [issues_arr[element]["html_url"] for element in num_list]
+    url_list = [f"https://code4rena.com/contests/{slug}/submissions/{element}" for element in num_list]
     title_list = [issues_arr[element]["title"] for element in num_list]
     dupes_list_user = [dupes_list[issues_parent[element]] for element in num_list]
     acceptance_list = [acceptance[element] for element in num_list]
@@ -340,11 +323,11 @@ if args.primary_issues:
         numbers=num_list,
         urls=url_list,
         titles=title_list,
-        username="Primary Issues",
+        username="Primary Submissions",
         dupes=dupes_list_user,
         status=acceptance_list,
         severities=severity_list,
-        repo=repo,
+        contest=slug,
     )
     quit()
 
@@ -352,18 +335,12 @@ if args.primary_issues:
 # Get relevant issues
 username = args.username
 issue_numbers = issuenum_by_user[username]
-url_list = [
-    element["html_url"] for element in issues_list if element["number"] in issue_numbers
-]
-title_list = [
-    element["title"] for element in issues_list if element["number"] in issue_numbers
-]
-num_list = [
-    element["number"] for element in issues_list if element["number"] in issue_numbers
-]
-dupes_list_user = [dupes_list[issues_parent[element]] for element in issue_numbers]
-acceptance_list = [acceptance[element] for element in issue_numbers]
-severity_list = [severities[element] for element in issue_numbers]
+url_list = [f"https://code4rena.com/contests/{slug}/submissions/{n}" for n in issue_numbers]
+title_list = [issues_arr[n]["title"] for n in issue_numbers]
+num_list = [n for n in issue_numbers]
+dupes_list_user = [dupes_list[issues_parent[n]] for n in issue_numbers]
+acceptance_list = [acceptance[n] for n in issue_numbers]
+severity_list = [severities[n] for n in issue_numbers]
 
 # %% Table output
 print_table(
@@ -374,5 +351,5 @@ print_table(
     dupes=dupes_list_user,
     status=acceptance_list,
     severities=severity_list,
-    repo=repo,
+    contest=slug,
 )
